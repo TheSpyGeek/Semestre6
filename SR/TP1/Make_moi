@@ -1,0 +1,18 @@
+
+
+all: ex1 ex2 ex3
+
+ex1: ex1.c
+		gcc ex1.c -o ex1
+
+ex2: ex2.c
+		gcc ex2.c -o ex2
+
+ex3: ex3.o csapp.o
+	gcc -o ex3 ex3.o csapp.o 
+
+csapp.o: csapp.c csapp.h
+	gcc -c csapp.c
+
+ex3.o: ex3.c csapp.h
+	gcc -c ex3.c
