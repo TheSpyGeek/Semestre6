@@ -1,0 +1,37 @@
+Section td1.
+
+Definition f := fun x => x + 2.
+
+Print f.
+
+Compute f.
+(* Question  *)
+Definition t := f 3.
+
+Compute t.
+(*2/*)
+
+Definition u := (fun x y => x - y) 8 10.
+
+
+Definition v := (fun x => fun y => x - y) 8 10.
+(*3/*)
+Definition c := (fun y x => y - x) 8 10.
+
+(*4/*)
+
+Variable y : nat.
+
+
+Definition d := (fun x => x + 7) y.
+Compute d.
+Print d.
+
+(*10/*)
+Variable u : nat.
+Variable w : nat.
+
+Definition e:= (fun v =>u v w ) 4.
+
+
+End td1.
