@@ -1,37 +1,62 @@
 Section td1.
 
-Definition f := fun x => x + 2.
+(* 1 *)
+Variable x :nat.
 
-Print f.
+Definition a := x + 2.
 
-Compute f.
+(* 2 *)
+Definition b := fun x => x + 2.
+
+Print b.
+
+Compute b.
 (* Question  *)
-Definition t := f 3.
 
-Compute t.
-(*2/*)
+(* 3 *)
 
-Definition u := (fun x y => x - y) 8 10.
+Definition c := (fun x =>x +2) 3.
 
-
-Definition v := (fun x => fun y => x - y) 8 10.
-(*3/*)
-Definition c := (fun y x => y - x) 8 10.
 
 (*4/*)
 
+Definition d1 := (fun x y => x - y) 8 10.
+
+
+Definition d2 := (fun x => fun y => x - y) 8 10.
+(*5/*)
+
+
+Definition e := b 3 +1.
+
+Compute e.
+
+
+(*6/*)
+
+Definition f1 :=(fun x => x 3 + 1 )b.
+
+(* 7 *)
+Definition g := d1 +1 .
+
+(* 8 *)
 Variable y : nat.
+Definition h := (fun x =>x + 7) y.
 
-
-Definition d := (fun x => x + 7) y.
-Compute d.
-Print d.
-
-(*10/*)
-Variable u : nat.
+(* 9  Impossible à évaluer*)
+ 
+(* 10 *)
+Definition u := fun x y => x + y +1.
 Variable w : nat.
+Definition i := (fun v => u v w)4.
 
-Definition e:= (fun v =>u v w ) 4.
+
+(*11/ Impossible à évaluer *)
+
+(* 12 je dirais bien impossible*)
+Definition f2 := fun x => x+5.
+
+Definition j := (b 1).
 
 
 End td1.
