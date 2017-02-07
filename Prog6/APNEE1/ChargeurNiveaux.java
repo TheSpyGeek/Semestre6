@@ -12,18 +12,18 @@ class ChargeurNiveaux {
 	}
 
 
-	static void prochainNiveau(){
+	public static void main(String [] args){
 
-		String stockage;
+		double stockage;
 		Scanner myscan = null;
 
-		File f = new File("Niveau-"+niveau+".txt");
+		File f = new File("testdouble.txt");
 		if(f.exists()){
 
 
 			try {
 				myscan = new Scanner(f);
-				System.out.println(myscan.delimiter());
+				//System.out.println(myscan.delimiter());
 			
 			} catch(FileNotFoundException e){
 				System.out.println("Erreur fichier non trouvé");
@@ -35,7 +35,7 @@ class ChargeurNiveaux {
 
 			while(myscan.hasNext()){
 
-				stockage = myscan.nextLine();
+				stockage = myscan.nextDouble();
 				// ou pour toute la ligne
 				//stockage = myscan.nextLine();
 				System.out.println(stockage);
