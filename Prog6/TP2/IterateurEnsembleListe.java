@@ -1,0 +1,7 @@
+
+class IterateurEnsembleListe implements Iterator {
+
+	
+	
+	
+}

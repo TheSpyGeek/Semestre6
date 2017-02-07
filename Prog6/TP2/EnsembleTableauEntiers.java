@@ -1,63 +1,86 @@
-class EnsembleTableauEntiers extends EnsembleEntiers{
-    
-    int [] elements;
-    int nbElt;
+/*
+ * Armoroides - casse briques Ã  but pÃ©dagogique
+ * Copyright (C) 2016 Guillaume Huard
+
+ * Ce programme est libre, vous pouvez le redistribuer et/ou le
+ * modifier selon les termes de la Licence Publique GÃ©nÃ©rale GNU publiÃ©e par la
+ * Free Software Foundation (version 2 ou bien toute autre version ultÃ©rieure
+ * choisie par vous).
+
+ * Ce programme est distribuÃ© car potentiellement utile, mais SANS
+ * AUCUNE GARANTIE, ni explicite ni implicite, y compris les garanties de
+ * commercialisation ou d'adaptation dans un but spÃ©cifique. Reportez-vous Ã  la
+ * Licence Publique GÃ©nÃ©rale GNU pour plus de dÃ©tails.
+
+ * Vous devez avoir reÃ§u une copie de la Licence Publique GÃ©nÃ©rale
+ * GNU en mÃªme temps que ce programme ; si ce n'est pas le cas, Ã©crivez Ã  la Free
+ * Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,
+ * Ã‰tats-Unis.
+
+ * Contact: Guillaume.Huard@imag.fr
+ *          Laboratoire LIG
+ *          700 avenue centrale
+ *          Domaine universitaire
+ *          38401 Saint Martin d'HÃ¨res
+ */
+package Ensembles;
+
+import java.util.NoSuchElementException;
+
+class EnsembleTableauEntiers<T> implements Ensemble<T> {
+
+    Object[] contenu;
+    int taille;
 
     EnsembleTableauEntiers() {
-        elements = new int [1];
-        nbElt = 0;
+        this(16);
     }
 
-    private void growTab(){
-        int [] ntab = new int [elements.length * 2];
-        for(int i = 0; i < elements.length; i++) {
-            ntab[i] = elements[i];
+    EnsembleTableauEntiers(int t) {
+        taille = 0;
+        contenu = new Object[t];
+    }
+
+    @Override
+    public void ajoute(T c) {
+        if (taille >= contenu.length) {
+            Object[] nouveau = new Object[contenu.length * 2];
+            System.arraycopy(contenu, 0, nouveau, 0, contenu.length);
+            contenu = nouveau;
         }
-
-        elements = ntab;
+        contenu[taille++] = c;
     }
 
-    public void ajoute(int e) {
-        if (nbElt == elements.length) {
-            growTab();
-        }
-        elements[nbElt] = e;
-        nbElt++;
-    }
-    
-    private void swap2Elts(int idx1, int idx2) {
-        int tmp;
-        tmp = elements[idx1];
-        elements[idx1] = elements[idx2];
-        elements[idx2] = tmp;
+    @Override
+    public Iterateur<T> iterateur() {
+        return new IterateurEnsembleTableauEntiers<T>(this);
     }
 
-    public void supprime(int e) throws Exception {
-        boolean found = false;
-        for (int i = 0; i < nbElt; i++) {
-            if (elements[i] == e) {
-                swap2Elts(i,nbElt-1);
-                found = true;
-                nbElt--;
+    @Override
+    public void supprime(T c) {
+        for (int i = 0; i < taille; i++) {
+            if (contenu[i] == c) {
+                taille--;
+                contenu[i] = contenu[taille];
+                contenu[taille] = null;
+                return;
             }
         }
-        if (!found) {
-            throw new Exception(e + "not found.");
-        }
+        throw new NoSuchElementException(c + " not found");
     }
 
-    public String toString(){
-        String res;
+    @Override
+    public String toString() {
+        String resultat = "{";
+        int i = 0;
 
-        res = "Tableau : [ ";
-        for (int i = 0; i < nbElt; i++) {
-            res+= elements[i];
-            if (i != nbElt - 1) {
-                res+=", ";
-            }
+        if (i < taille) {
+            resultat += contenu[i++];
         }
-        res +=" ]";
-        
-        return res;
+        while (i < taille) {
+            resultat += ", " + contenu[i++];
+        }
+        return resultat + "}";
     }
+
 }

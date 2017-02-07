@@ -18,6 +18,12 @@ class EnsembleListeEntiers implements EnsembleEntiers {
 		tete = null;
 	}
 
+	/// ITERATOR 
+	public Iterateur<T> iterateur() {
+	    return new IterateurEnsembleListe<>(this);
+	}
+
+
 	public void ajoute(int c){
 		Noeud nouveau = new Noeud(c, tete);
 		tete = nouveau;
