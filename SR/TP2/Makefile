@@ -16,7 +16,7 @@ INCLUDE = csapp.h
 OBJS = csapp.o
 INCLDIR = -I.
 
-PROGS = exo2 alarm
+PROGS = exo1 counterprob waitpid1 signal1
 
 all: $(PROGS)
 
