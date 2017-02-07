@@ -9,7 +9,12 @@ public abstract class EnsembleEntiers {
 	static EnsembleEntiers petit = null, grand = null;
 
 
+
+
+
+
 	public static void init(Properties prop){
+
 		if(prop.getProperty("GrandEnsemble").equals("Liste")){
 			grand = new SousEnsemble_abstract();
 		} else if(prop.getProperty("GrandEnsemble").equals("Tableau")){
@@ -26,6 +31,7 @@ public abstract class EnsembleEntiers {
 			System.out.println("Erreur petit");
 		}
 	}
+	
 
 	public static EnsembleEntiers Petit(){
 		return petit;
