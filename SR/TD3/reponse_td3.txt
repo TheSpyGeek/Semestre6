@@ -1,0 +1,27 @@
+
+
+			TD3 Entrées - Sorties
+
+Question 2.2
+
+Affiche le numéro du fichier "titi.txt"
+
+Question 2.3
+
+meme chose
+
+Question 2.4
+
+Il affiche "c = l"
+
+Question 2.5
+
+Il affiche "c = a"
+
+Question 2.6
+
+Il affiche "c = a"
+
+Question 3.1
+
+On en voit pas 
