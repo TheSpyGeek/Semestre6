@@ -28,7 +28,13 @@ class Pipo {
         // This is were you need to update the language model (hash of hashes)
         int occ;
 
-
+        ///// CALCUL DES FREQUENCES 
+        if(Frequencies_learn.containsKey(w1)){ 
+            occ = Frequencies_learn.get(w1);
+            Frequencies_learn.put(w1, occ+1);    
+        } else {
+            Frequencies_learn.put(w1, 1); 
+        }
 
         try {
             if(LangModel.containsKey(w1)){ // le mot w1 est déjà présent dans la table de hachage de table de hachage
@@ -57,16 +63,7 @@ class Pipo {
         try {
             while (in1.hasNext()) {
 
-
-                ///// CALCUL DES FREQUENCES 
-                if(Frequencies_learn.containsKey(word1)){ 
-                    occ = Frequencies_learn.get(word1);
-                    Frequencies_learn.put(word1, occ+1);    
-                } else {
-                    Frequencies_learn.put(word1, 1); 
-                }
-
-
+                
 
 
                 String word2 = in1.next();
@@ -74,11 +71,14 @@ class Pipo {
                     // word2 is glued with a punctuation mark
                     String[] splitedWord= word2.split("(?=[.,!?<>=+-/])|(?<=])");
                     for (String s : splitedWord) {
+
                         newWorsSeq(word1,s); // update de language model
                         word1=s;
                     }
 
                 } else { // word2 is a single word
+
+
                     newWorsSeq(word1,word2); // update de language model
                     word1=word2;
                 }
@@ -86,6 +86,8 @@ class Pipo {
         } catch (Exception e) {
             System.out.println("Erreur dans learn : "+e);
         }
+
+        System.out.println("Nombre de mot : "+sum(Frequencies_learn));
     }
 
     int sum(Hashtable<String,Integer> H){
@@ -105,8 +107,8 @@ class Pipo {
         int max_occ = 0;
 
 
-        for(int i=1; i<=10; i++){
-            
+        for(int i=1; i<=10; i++){ // pour les 10 premiers
+
             Enumeration<String> e = Frequencies_learn.keys();
             max_occ = 0;
             while(e.hasMoreElements()){
@@ -120,7 +122,7 @@ class Pipo {
 
 
             }
-            System.out.println("Position "+i+": "+word_max);
+            System.out.println("Position "+i+": "+word_max+"  :   avec "+max_occ+" occurences");
             Frequencies_learn.put(word_max, -1); // pour eviter de le retraiter
         }
 
