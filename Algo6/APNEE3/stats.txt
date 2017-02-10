@@ -1,0 +1,65 @@
+Pour texte 1M :
+
+Position 1: de
+Position 2: .
+Position 3: ,
+Position 4: le
+Position 5: la
+Position 6: et
+Position 7: que
+Position 8: des
+Position 9: est
+Position 10: pour
+
+Pour texte 100 000 :
+
+Position 1: de
+Position 2: .
+Position 3: ,
+Position 4: le
+Position 5: la
+Position 6: et
+Position 7: que
+Position 8: des
+Position 9: est
+Position 10: pour
+
+Pour texte 1 000 :
+
+Position 1: de
+Position 2: .
+Position 3: ,
+Position 4: le
+Position 5: la
+Position 6: pour
+Position 7: et
+Position 8: les
+Position 9: des
+Position 10: nous
+
+Pour texte 100 : 
+
+Position 1: de
+Position 2: le
+Position 3: .
+Position 4: nous
+Position 5: un
+Position 6: temps
+Position 7: relation
+Position 8: que
+Position 9: une
+Position 10: nombre
+
+Pour texte apprentissage : 
+
+Position 1: de
+Position 2: .
+Position 3: ,
+Position 4: le
+Position 5: la
+Position 6: et
+Position 7: que
+Position 8: des
+Position 9: est
+Position 10: pour
+

@@ -1,0 +1,2 @@
+Mesure expérimentale d'une fonction de coût par instrumentation d'un programme.
+Introduction. par une par quoi par une.
