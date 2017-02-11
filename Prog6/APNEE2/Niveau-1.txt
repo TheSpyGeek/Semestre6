@@ -1,0 +1,80 @@
+Composants:
+    1:
+        type: brique
+        resistance: 1
+        couleur: rgba(0,100%,0,1.0)
+    2:
+        type: brique
+        resistance: 2
+        couleur: rgba(100%,0,0,1.0)
+    3:
+        type: bonus
+        nature: Elargit
+    4:
+        type: bonus
+        nature: Laser
+    5:
+        type: brique
+        resistance: 0
+        couleur: rgba(70%,70%,70%,1.0)
+    6:
+        type: bonus
+        nature: Multiballes
+    7:
+        type: bonus
+        nature: Retrecit
+Couches:
+    0: |
+        ....................................
+        .                                  .
+        .                                  .
+        .                3                 .
+        .                7                 .
+        .                3                 .
+        .                7                 .
+        .                3                 .
+        .                7                 .
+        .    6   4   6   3   6   4   6     .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+        .                                  .
+    1: |
+        ####################################
+        #                                  #
+        #                                  #
+        #    1 1 1 1 1 1 1 1 1 1 1 1 1     #
+        #  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1   #
+        #  1 1 1 2 2 2 2 1 2 2 2 2 1 1 1   #
+        #  1 1 1 1     1 1 1     1 1 1 1   #
+        #  1 1 1       1 1 1       1 1 1   #
+        #    1 1 1 1 1 1 1 1 1 1 1 1 1     #
+        #    1   1   1   1   1   1   1     #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
+        #                                  #
