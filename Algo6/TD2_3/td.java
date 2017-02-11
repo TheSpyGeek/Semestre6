@@ -71,6 +71,7 @@ class td {
 					}
 				} else {
 					apprend.put(mot_avant, new Hashtable<String, Integer>());
+					apprend.get(mot_avant).put(mot_apres, 1);
 				}
 
 				mot_avant = mot_apres;
