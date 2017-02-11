@@ -83,6 +83,12 @@ int main(int argc, char *argv[], char *env[])
 					dup2(out, 1); // 1 = stdout
 					close(out);
 				} 
+
+				if(l->in != NULL){
+					int in = open(l->in, O_RDWR | O_TRUNC | O_CREAT, S_IWUSR | S_IRUSR);
+					dup2(in, 0);
+					close(in);
+				}
 				
 
 
@@ -93,9 +99,6 @@ int main(int argc, char *argv[], char *env[])
 			}
 
 			waitpid(-1, &status, 0);
-
-
-
 			printf("\n");
 		}
 
