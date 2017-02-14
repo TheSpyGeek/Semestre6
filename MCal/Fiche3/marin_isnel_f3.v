@@ -19,4 +19,6 @@ Definition C1: cnat := fun f x => f x.
 Definition C2: cnat := fun f x => f (f x).
 
 
+(* Question 2 *)
 
+Definition cn : cnat -> cnat := fun n => fun f x => f (n f x).
