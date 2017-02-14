@@ -62,6 +62,8 @@ int main(int argc, char *argv[], char *env[]){
 				printf("%s ", cmd[j]);
 			}
 
+
+		  	 //  /// CAS PARTICULIERS / / / // / /
 			////exit
 			if(!strcmp(cmd[0], "exit")){
 				printf("\n");
