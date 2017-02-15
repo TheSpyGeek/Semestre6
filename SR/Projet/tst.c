@@ -28,14 +28,15 @@
 #include "readcmd.h"
 
  void close_pipe(int tubes[10][2], int seq_len){
- 	for(int k; k < seq_len; k ++){ //une fois après avoir écrit dans les pipes, il faut les fermer #prof
-			close(tubes[k][0]);
-			close(tubes[k][1]);
+ 	int i;
+ 	for(i=0; i < seq_len; i ++){ //une fois après avoir écrit dans les pipes, il faut les fermer #prof
+			close(tubes[i][0]);
+			close(tubes[i][1]);
 	}
 
  }
 
- int lenght_seq(char ***seq){
+ int length_seq(char ***seq){
  	int i;
  	for (i=0; seq[i]!=0; i++);
  	return i;
@@ -45,7 +46,7 @@ int main(int argc, char *argv[], char *env[])
 {
 	while (1) {
 		struct cmdline *l;
-		int i, j, lenght;
+		int i, length;
 		int status;
 		int tubes[10][2]; // on peut faire en double pointeur avec malloc si tu préfères <3
 		int in , out;
@@ -54,7 +55,7 @@ int main(int argc, char *argv[], char *env[])
 		printf("shell> ");
 		l = readcmd();
 
-		lenght = lenght_seq(l->seq);
+		length = length_seq(l->seq);
 
 		/* If input stream closed, normal termination */
 		if (!l) {
@@ -68,17 +69,19 @@ int main(int argc, char *argv[], char *env[])
 			continue;
 		}
 
-		if (l->in) {
-			printf("in: %s\n", l->in);
-			in = open(l->in, O_RDWR | O_TRUNC | O_CREAT, S_IWUSR | S_IRUSR); //on a besoin d'pen qu'une fois
-		}
-		if (l->out){
-			printf("out: %s\n", l->out);
-			out = open(l->out, O_RDWR | O_TRUNC | O_CREAT, S_IWUSR | S_IRUSR);
-
-
+		if(l->out != NULL){ // creation du filedescriptor des sorties
+			printf("out : %s\n", l->out);
+			out = open(l->out, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP  | S_IROTH);
 		} 
-		for (i=0; i<lenght; i++) {// boucle ouverture pipe
+
+		if(l->in != NULL){ // creation du filedescriptor des entrées 
+			printf("in : %s\n", l->in);
+			in = open(l->in, O_RDONLY);
+		}
+
+
+
+		for (i=0; i<length; i++) {// boucle ouverture pipe
 			pipe(tubes[i]);
 		}
 
@@ -96,7 +99,8 @@ int main(int argc, char *argv[], char *env[])
 
 			if(fork() == 0){ // child
 
-				if(lenght > 1){
+				////  SI Y A UN PIPE
+				if(length > 1){
 					if(i == 0){ //cas premier cmd du pipe
 						dup2(tubes[i][1], STDOUT_FILENO); 
 						if(l->in != NULL){
@@ -106,7 +110,7 @@ int main(int argc, char *argv[], char *env[])
 
 					}
 
-					else if (i == lenght - 1){ //cas dernière cmd
+					else if (i == length - 1){ //cas dernière cmd
 						dup2(tubes[i-1][0], STDIN_FILENO); //STDIN_FILENO == 0, mais ça bug si on met 0
 						if(l->out != NULL){ // redirection des sorties
 							dup2(out, STDOUT_FILENO); // 1 = stdout
@@ -120,20 +124,24 @@ int main(int argc, char *argv[], char *env[])
 						dup2(tubes[i][1], STDOUT_FILENO);	
 					}
 
-				}
+
+
+				} // SI Y A PAS BESOIN DE PIPE
+
+
 				else {
 					if(l->out != NULL){ // redirection des sorties
 						dup2(out, STDOUT_FILENO); // 1 = stdout
 						close(out);
 					} 
 
-					if(l->in != NULL){
+					if(l->in != NULL){ //redirection des entées
 						dup2(in, STDIN_FILENO);
 						close(in);
 					}
 				}
 
-				close_pipe(tubes, lenght);
+				close_pipe(tubes, length);
 				execvp(cmd[0], cmd);
 				exit(0); 
 
@@ -146,8 +154,9 @@ int main(int argc, char *argv[], char *env[])
 		} //fin du for
 		// on est cons, faut attendre tout les fils à chaque itération
 
-		close_pipe(tubes, lenght);
-		for(int k;l->seq[k]!=0; k++){
+		close_pipe(tubes, length);
+
+		for(i=0;l->seq[i]!=0; i++){
 				waitpid(-1, &status, 0);
 		}
 		
