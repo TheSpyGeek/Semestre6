@@ -111,7 +111,7 @@ int main(int argc, char *argv[], char *env[])
 					}
 
 					else if (i == length - 1){ //cas dernière cmd
-						dup2(tubes[i-1][0], STDIN_FILENO); //STDIN_FILENO == 0, mais ça bug si on met 0
+						dup2(tubes[i-1][0], STDIN_FILENO); 
 						if(l->out != NULL){ // redirection des sorties
 							dup2(out, STDOUT_FILENO); // 1 = stdout
 							close(out);

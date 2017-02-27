@@ -90,6 +90,10 @@ static char **split_in_words(char *line)
 			w = "|";
 			cur++;
 			break;
+		case '&':
+			w = "&";
+			cur++;
+			break;
 		default:
 			/* Another word */
 			start = cur;
@@ -184,6 +188,7 @@ struct cmdline *readcmd(void)
 	s->in = 0;
 	s->out = 0;
 	s->seq = 0;
+	s->background = 0;
 
 	i = 0;
 	while ((w = words[i++]) != 0) {
@@ -226,6 +231,9 @@ struct cmdline *readcmd(void)
 			cmd = xmalloc(sizeof(char *));
 			cmd[0] = 0;
 			cmd_len = 0;
+			break;
+		case '&':
+			s->background = 1;
 			break;
 		default:
 			cmd = xrealloc(cmd, (cmd_len + 2) * sizeof(char *));
