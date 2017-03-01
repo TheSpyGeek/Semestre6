@@ -27,6 +27,11 @@
 
 #include "readcmd.h"
 
+void ctrl_c(int sig);
+void ctrl_z(int sig);
+void stop_process_foreground();
+int my_signal(int sig);
+
  void close_pipe(int tubes[10][2], int seq_len){
  	int i;
  	for(i=0; i < seq_len; i ++){ //une fois après avoir écrit dans les pipes, il faut les fermer #prof
@@ -42,20 +47,24 @@
  	return i;
  }
 
-int main(int argc, char *argv[], char *env[])
-{
+
+struct cmdline *l;
+
+int main(int argc, char *argv[], char *env[]){
+
+	signal(SIGINT, ctrl_c);
+	signal(SIGTSTP, ctrl_z);
+
 	while (1) {
-		struct cmdline *l;
 		int i, length;
-		int status;
 		int tubes[10][2]; // on peut faire en double pointeur avec malloc si tu préfères <3
 		int in , out;
+		int status;
 
 
 		printf("shell> ");
 		l = readcmd();
 
-		length = length_seq(l->seq);
 
 		/* If input stream closed, normal termination */
 		if (!l) {
@@ -70,15 +79,14 @@ int main(int argc, char *argv[], char *env[])
 		}
 
 		if(l->out != NULL){ // creation du filedescriptor des sorties
-			printf("out : %s\n", l->out);
 			out = open(l->out, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP  | S_IROTH);
 		} 
 
 		if(l->in != NULL){ // creation du filedescriptor des entrées 
-			printf("in : %s\n", l->in);
 			in = open(l->in, O_RDONLY);
 		}
 
+		length = length_seq(l->seq);
 
 
 		for (i=0; i<length; i++) {// boucle ouverture pipe
@@ -96,6 +104,7 @@ int main(int argc, char *argv[], char *env[])
 				exit(0);
 			}
 
+			
 
 			if(fork() == 0){ // child
 
@@ -148,6 +157,8 @@ int main(int argc, char *argv[], char *env[])
 
 			}
 
+		
+
 			
 			close(tubes[i][1]);
 			
@@ -156,10 +167,35 @@ int main(int argc, char *argv[], char *env[])
 
 		close_pipe(tubes, length);
 
-		for(i=0;l->seq[i]!=0; i++){
+		if(!l->background){ // si ce n'est pas en background
+			for(i=0;l->seq[i]!=0; i++){
 				waitpid(-1, &status, 0);
+			}
 		}
+
 		
-	} //fin du while
+	} //fin du while de boucle infini
 
 }
+
+
+void ctrl_c(int sig){
+	/*int i;
+	for(i=0;l->seq[i]!=0; i++){
+		kill(getpid(), SIGINT);
+	}*/
+	return;
+}
+
+void ctrl_z(int sig){
+	/*int i;
+	for(i=0;l->seq[i]!=0; i++){
+		kill(, SIGTSTP);
+	}*/
+
+	return;
+
+}
+
+
+
