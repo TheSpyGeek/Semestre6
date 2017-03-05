@@ -13,7 +13,7 @@ int length_seq(char ***seq){
 void aff_jobs(struct Jobs j){
 
 	printf("\n\nLigne de commande : %s\n", j.cmd);
-	printf("Foreground : %d\n", j.foreground);
+	printf("Foreground : %d\n", j.background);
 	printf("Cmd stopped : %d\n", j.stopped);
 	printf("PID ::::\n");
 

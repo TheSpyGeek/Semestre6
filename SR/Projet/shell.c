@@ -42,9 +42,6 @@ void handler_child(int sig);
 
 
 
-
-
-
  void close_pipe(int tubes[10][2], int seq_len){
  	int i;
  	for(i=0; i < seq_len; i ++){ //une fois après avoir écrit dans les pipes, il faut les fermer #prof
@@ -70,13 +67,11 @@ int main(int argc, char *argv[], char *env[]){
 
 	Tab_Jobs = malloc(sizeof(struct Jobs));
 
-	printf("PID shell %d\n", getpid());
 
 	while (1) {
 		int i;
 		int tubes[10][2]; 
 		int in , out;
-		//int status;
 		pid_t pid;
 
 
@@ -157,7 +152,7 @@ int main(int argc, char *argv[], char *env[]){
 			}
 		
 
-			
+			// Creation d'un nouveau processus pour chaque commande
 
 			if((pid = fork()) == 0){ // child
 
@@ -207,25 +202,21 @@ int main(int argc, char *argv[], char *env[]){
 
 
 				close_pipe(tubes, length);
-				execvp(cmd[0], cmd);			
+				execvp(cmd[0], cmd); // on execute		
 				exit(0);
 			}
 
 			Tab_Jobs[indice_jobs].Tab_pid[i] = pid;
-
-
 			
 			close(tubes[i][1]);
 			
 		}
 
-		Tab_Jobs[indice_jobs].Tab_pid[length] = 0;
-
-		//aff_jobs(Tab_Jobs[indice_jobs]);
-
+		Tab_Jobs[indice_jobs].Tab_pid[length] = 0; // pour savoir quand on s'arrete quand on parcourt
 		close_pipe(tubes, length);
 
 
+		//on attend tant que la commande ne s'est pas entièrement terminée
 		while(!Tab_Jobs[indice_jobs].finished && !Tab_Jobs[indice_jobs].stopped && !Tab_Jobs[indice_jobs].background ){
 			sleep(1);
 		}		
@@ -242,7 +233,6 @@ void handler_child(int sig){
 
 	waitpid(-1, &status, WNOHANG|WUNTRACED);
 
-	//printf("Signal %d and  id sig %d\n", pid, status);
 
 	Tab_Jobs[indice_jobs].finished = 1; // on indique qu'il est fini pour sortir de la boucle de sleep
 
@@ -250,12 +240,11 @@ void handler_child(int sig){
 		Tab_Jobs[indice_jobs].stopped = 1;
 	} 
 
-
-
-
 	return;
 }
 
+
+/// on enleve le traitement par default des signaux
 void ctrl_c(int sig){
 	return;
 }
