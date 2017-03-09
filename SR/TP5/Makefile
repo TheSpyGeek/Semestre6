@@ -16,7 +16,7 @@ INCLUDE = csapp.h tell_wait.h
 OBJS = csapp.o tell_wait.o
 INCLDIR = -I.
 
-PROGS = shm_server shm_client
+PROGS = shm_server shm_client mask peterson
 
 all: $(PROGS)
 

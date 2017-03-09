@@ -34,8 +34,9 @@ int main()
     }
 
     /* Now read what the server put in the memory.*/
-    for (s = shm; *s != '\0'; s++)
+    for (s = shm; *s != '\0'; s++){
         putchar(*s);
+    }
     putchar('\n');
 
     /*

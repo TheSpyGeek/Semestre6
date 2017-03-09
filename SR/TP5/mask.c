@@ -1,3 +1,13 @@
+
+
+
+
+
+#include "csapp.h"
+
+#define NB_SIG 8
+#define SIGRT_ON 1
+
 void handler_sigint(int sig)
 {
     printf("Caught SIGINT\n");
