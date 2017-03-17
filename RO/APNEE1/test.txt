@@ -1,0 +1,4 @@
+c test
+p edge 3
+e 0 1
+e 0 2
