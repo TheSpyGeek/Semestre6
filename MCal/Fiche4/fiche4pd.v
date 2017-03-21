@@ -53,6 +53,43 @@ Definition neg2 : pbool -> pbool:= fun b => b pbool ptr pfa.
 
 (*conjontion et*)
 
+Definition conjonc : pbool -> pbool -> pbool := fun a b => a pbool b a.
+
+(* disjonction ou *)
+
+Definition disjonc : pbool -> pbool -> pbool := fun a b => a pbool a b.
+
+(* Question 4 *) 
+
+Definition f3ou5 : pbool -> nat := fun a => a nat 3 5.
+
+(* Question 5 *)
+
+Definition itself : pbool -> pbool := fun a => a pbool a a.
+
+(* Exercice 3*)
+(* Question 1 *)
+
+Definition pprod_nb : Set := forall T: Set, (nat -> bool -> T) -> T.
+
+Definition ppair_nb : nat -> bool -> pprod_nb := fun n a => fun T => (fun k => k n a).
+
+(* Question 2 *)
+
+Definition pprod_bn : Set := forall T: Set, (bool -> nat -> T) -> T.
+
+Definition ppair_bn : bool -> nat -> pprod_bn := fun n a => fun T => (fun k => k n a).
+
+(* Question 3 *)
+
+Definition nb_vers_bn : pprod_nb -> pprod_bn := fun c => c pprod_bn (fun n b => ppair_bn b n).
+
+(* Question 4 *)
+
+
+
+
+
 
  
 
