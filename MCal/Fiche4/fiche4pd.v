@@ -86,7 +86,7 @@ Definition nb_vers_bn : pprod_nb -> pprod_bn := fun c => c pprod_bn (fun n b => 
 
 (* Question 4 *)
 
-
+Definition pprod (U V: Set) : Set := forall T:Set, (nat -> bool -> T) -> T.
 
 
 
