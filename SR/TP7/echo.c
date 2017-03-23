@@ -26,7 +26,7 @@ void echo(int connfd)
 
     if(fd != -1){
 	    while ((n = read(fd, buf, MAXLINE)) != 0) {
-	        printf("server received %u bytes\n", (unsigned int)n);
+	        // printf("server received %u bytes\n", (unsigned int)n);
 	        Rio_writen(connfd, buf, n);
 	    }
     	

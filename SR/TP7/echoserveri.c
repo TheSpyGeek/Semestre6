@@ -63,8 +63,7 @@ int main(int argc, char **argv)
 	        /* determine the textual representation of the client's IP address */
 	        Inet_ntop(AF_INET, &clientaddr.sin_addr, client_ip_string, INET_ADDRSTRLEN);
 	        
-	        printf("server connected to %s (%s)\n", client_hostname,
-	               client_ip_string);
+	        printf("server connected to %s (%s)\n", client_hostname, client_ip_string);
 
 	        echo(connfd);
 		    Close(connfd);
