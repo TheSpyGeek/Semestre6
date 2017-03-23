@@ -15,8 +15,8 @@ LDFLAGS =
 #LIBS += -lsocket -lnsl -lrt
 LIBS += -lpthread
 
-INCLUDE = csapp.h
-OBJS = csapp.o
+INCLUDE = csapp.h echo.h
+OBJS = csapp.o echo.o
 INCLDIR = -I.
 
 PROGS = echoserveri echoclient

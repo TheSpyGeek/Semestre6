@@ -3,11 +3,11 @@
  */
 
 #include "csapp.h"
-#include "echo.c"
+#include "echo.h"
 
 #define MAX_NAME_LEN 256
 
-#define NPROC 4
+#define NPROC 3
 
 pid_t tab[NPROC];
 
@@ -17,18 +17,20 @@ pid_t tab[NPROC];
  * (IPv6 is not supported)
  */
 
-void handler(int sig);
+void handler_kill(int sig);
+void handler_fork(int sig);
 
 int main(int argc, char **argv)
 {
 	pid_t pid;
+	int status;
     int listenfd, connfd, port;
     socklen_t clientlen;
     struct sockaddr_in clientaddr;
     char client_ip_string[INET_ADDRSTRLEN];
     char client_hostname[MAX_NAME_LEN];
 
-    signal(SIGINT, handler);
+    signal(SIGINT, handler_kill);
     
     if (argc != 2) {
         fprintf(stderr, "usage: %s <port>\n", argv[0]);
@@ -43,35 +45,35 @@ int main(int argc, char **argv)
 
     for(int i=0; i<NPROC; i++){
     	pid = fork();
-    	tab[i] = pid;
+    	if(pid == 0){ // fils
+    		printf("Creation du fils %d\n", getpid());
+    		tab[i] = getpid();
+    	} else { // pere
+    		wait(NULL);
+    	}
     }
     if(pid == 0){
 	    while (1) {
 	        
 	        connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen);
 
-
-        	printf("Creation du fils %d\n", getpid());
-
         	/* determine the name of the client */
-	        Getnameinfo((SA *) &clientaddr, clientlen,
-	                    client_hostname, MAX_NAME_LEN, 0, 0, 0);
+	        Getnameinfo((SA *) &clientaddr, clientlen, client_hostname, MAX_NAME_LEN, 0, 0, 0);
 	        
 	        /* determine the textual representation of the client's IP address */
-	        Inet_ntop(AF_INET, &clientaddr.sin_addr, client_ip_string,
-	                  INET_ADDRSTRLEN);
+	        Inet_ntop(AF_INET, &clientaddr.sin_addr, client_ip_string, INET_ADDRSTRLEN);
 	        
 	        printf("server connected to %s (%s)\n", client_hostname,
 	               client_ip_string);
 
 	        echo(connfd);
 		    Close(connfd);
-
-	    	exit(0);
-
-	        
 	    }
     	
+    } else {
+    	for(int i=0; i<NPROC; i++){
+    		waitpid(-1, &status, 0);
+    	}
     }
 }
 
@@ -88,9 +90,11 @@ void handler_fork(int sig){
 	return;
 }
 
-void handler(int sig){
+void handler_kill(int sig){
+
 	for(int i=0; i<NPROC; i++){
 		kill(tab[i], SIGINT);
 	}
 	exit(0);
+	return;
 }
