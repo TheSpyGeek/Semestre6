@@ -20,9 +20,9 @@ public static void main(Fenetre f, String [] args) {
             f.tracerSansDelai(p);
         }
 
+        /// calcul de l'enveloppe
 
-
-	      enveloppe = algo_jarvis(f, nuage);
+	    enveloppe = algo_jarvis(f, nuage);
 
         System.out.println("Enveloppe : "+enveloppe);
         
