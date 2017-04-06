@@ -33,3 +33,5 @@ all: $(PROGS)
 	
 clean:
 	rm -f $(PROGS) *.o
+move:
+	mv client Client/

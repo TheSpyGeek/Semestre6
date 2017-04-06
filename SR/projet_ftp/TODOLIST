@@ -1,5 +1,5 @@
 
 
 fermeture du master propre (fermer les slaves comme il faut)
-
+gerer le meme espace de stockage
 ajout d'une file d'attente pour les clients qui arrive alors que tous le monde est occupé

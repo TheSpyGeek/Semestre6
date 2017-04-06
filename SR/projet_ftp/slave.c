@@ -21,9 +21,19 @@ int main(int argc, char **argv){
 
 	int connected = 0;
 	int int_cmd;
-	int n;
+	int n, nb, nb_courant, nb_octets;
 	int info;
 	char filename[MAXLINE];
+	char buf[MAXLINE];
+
+	struct stat file_stat;
+
+	int file;
+
+	// int sortie;
+
+
+	char *argument[2];
 
 	char client_ip_string[INET_ADDRSTRLEN];
 
@@ -60,7 +70,17 @@ int main(int argc, char **argv){
 			    		close(clientfd);
 						break;
 					case LS:
-						printf("[SLAVE] ls not implemented yet\n");
+						argument[0] = malloc(sizeof(char)*5);
+						strcpy(argument[0], "ls");
+						argument[1] = NULL;
+						/*sortie = dup(STDOUT_FILENO);
+						dup2(clientfd, STDOUT_FILENO);
+						execvp(argument[0], argument);
+						printf("fini\n");
+						dup2(sortie, STDOUT_FILENO);
+						close(sortie);
+						free(argument[0]);*/
+						printf("[CLIENT] Not implemented yet\n");
 						break;
 
 					case GET : 
@@ -68,6 +88,42 @@ int main(int argc, char **argv){
 						write(clientfd, &info, sizeof(int));
 						read(clientfd, filename, MAXLINE);
 						printf("[SLAVE] filename %s\n", filename);
+
+						file = open(filename, O_RDONLY);
+
+						if(file != -1){
+							if(fstat(file, &file_stat) == 0){
+								nb_octets = file_stat.st_size;
+								printf("[SLAVE] file : %d bytes\n", nb_octets);
+								write(clientfd, &nb_octets, sizeof(int));
+
+								read(clientfd, &info, sizeof(int));
+								if(info == OK){
+									nb = 0;
+									while(nb < nb_octets){
+										nb_courant = read(file, buf, MAXLINE);
+										nb += nb_courant;
+										write(clientfd, buf, nb_courant);
+									}
+
+									printf("[SLAVE] Transfert successfully done!\n");
+
+									
+								} else {
+									printf("[SLAVE] Error client crashed ?\n");
+									close(clientfd);
+									connected = 0;
+								}								
+							}
+
+						} else {
+							nb_octets = -1;
+							write(clientfd, &nb_octets, sizeof(int));
+							printf("[CLIENT] Error failed to open %s\n", filename);
+						}
+
+
+
 						break;
 					default:
 						break;

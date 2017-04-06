@@ -101,7 +101,7 @@ int cmd_to_int(char *cmd){
 
 	if(!strcmp(cmd, "get")){
 		return GET;
-	} else if(!strcmp(cmd, "exit") || !strcmp(cmd, "quit")){
+	} else if(!strcmp(cmd, "exit") || !strcmp(cmd, "quit") || !strcmp(cmd, "bye")){
 		return EXIT;
 	} else if(!strcmp(cmd, "ls")){
 		return LS;

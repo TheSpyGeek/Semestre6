@@ -23,5 +23,6 @@
 #define BUSY 1
 
 #define OK 1
+#define ERROR_OPEN 2
 
 #define SHORT_TIMEOUT 3
