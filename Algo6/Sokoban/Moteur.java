@@ -3,7 +3,7 @@ import java.util.*;
 
 class Moteur {
     Terrain t;
-    int lignePousseur, colonnePousseur;
+    int lignePousseur, colonnePousseur, nb_actions = 0;
 
 
     Moteur(Terrain t) {
@@ -58,6 +58,7 @@ class Moteur {
 
                 lignePousseur = i;
                 colonnePousseur = j;
+                nb_actions ++;
 
                 return true;
                 
@@ -79,6 +80,12 @@ class Moteur {
     private boolean est_possible(int i, int j){
         return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0 && t.consulter(i,j).estLibre());
     }
+
+
+    public int nombre_actions(){
+        return nb_actions;
+    }
+
 
 
 
