@@ -240,7 +240,7 @@ public class Graphe {
         Graphe complet = new Graphe(k);
 
         for(int i=0; i<k; i++){
-            for(int j=0; j<k; j++){
+            for(int j=0; j<i; j++){
                 if(i != j){ // si on veut éviter les boucles sur les sommets 
                     complet.ajouteArete(i,j);
                 }

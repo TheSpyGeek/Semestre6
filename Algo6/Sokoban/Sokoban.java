@@ -33,7 +33,7 @@ public class Sokoban {
         TerrainGraphique tg = new TerrainGraphique(f, t);
 
         e.addMouseListener(new EcouteurDeSouris(f, tg, m));
-        e.addKeyListener(new EcouteurDeClavier());
+        e.addKeyListener(new EcouteurDeClavier(f, t, tg, m));
 
         f.tracerSansDelai(tg);
 

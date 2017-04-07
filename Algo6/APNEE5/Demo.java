@@ -37,7 +37,7 @@ public class Demo {
          Point [] nuage;
 
         // /* Point pour l'enveloppe RANDOM */
-        nuage = new Point[nb_point];
+        /*nuage = new Point[nb_point];
 
         for (int i=0; i<nb_point; i++) {
             int x = r.nextInt(f.largeur()-20)+10;
@@ -45,28 +45,28 @@ public class Demo {
             Point p = new Point(x, y);
             nuage[i] = p;
             f.tracerSansDelai(p);
-        }
+        }*/
 
 
         /* Point pour tester l'alignement */
 
-        // nb_point = 9;
+        nb_point = 9;
 
-        // nuage = new Point[nb_point];
+        nuage = new Point[nb_point];
 
-        // nuage[0] = new Point(200, 200);
-        // nuage[1] = new Point(150, 200);
-        // nuage[2] = new Point(350, 350);
-        // nuage[3] = new Point(50, 200);
-        // nuage[4] = new Point(280, 280);
-        // nuage[5] = new Point(300, 300);
-        // nuage[6] = new Point(200, 290);
-        // nuage[7] = new Point(200, 250);
-        // nuage[8] = new Point(150, 210);
+        nuage[0] = new Point(200, 200);
+        nuage[1] = new Point(150, 200);
+        nuage[2] = new Point(350, 350);
+        nuage[3] = new Point(50, 200);
+        nuage[4] = new Point(280, 280);
+        nuage[5] = new Point(300, 300);
+        nuage[6] = new Point(200, 290);
+        nuage[7] = new Point(200, 250);
+        nuage[8] = new Point(150, 210);
 
-        // for(int i=0; i<nuage.length; i++){
-        //     f.tracerSansDelai(nuage[i]);
-        // }
+        for(int i=0; i<nuage.length; i++){
+            f.tracerSansDelai(nuage[i]);
+        }
 
         /* Points pour tester segment 3 points */
 
