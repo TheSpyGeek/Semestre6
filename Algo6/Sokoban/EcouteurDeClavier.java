@@ -25,7 +25,7 @@ class EcouteurDeClavier implements KeyListener {
     }
 
     private boolean est_possible(int i, int j){
-        return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0 && t.consulter(i,j).estLibre());
+        return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0);
     }
 
 
@@ -33,36 +33,36 @@ class EcouteurDeClavier implements KeyListener {
         int x = colonnePousseur;
         int y = lignePousseur;
         switch (e.getKeyCode()) {
+        case 90:
         case KeyEvent.VK_UP:
-            System.out.println("Up");
             if (est_possible(y-1, x) && m.action(y-1, x)) {
                 f.tracerSansDelai(tg);
                 lignePousseur--;
             }
             break;
+        case 68:
         case KeyEvent.VK_RIGHT:
-            System.out.println("Right");
             if (est_possible(y, x+1) && m.action(y, x+1)) {
                 f.tracerSansDelai(tg);
                 colonnePousseur++;
             }
             break;
+        case 83:
         case KeyEvent.VK_DOWN:
-            System.out.println("Down");
             if (est_possible(y+1, x) && m.action(y+1, x)) {
                 f.tracerSansDelai(tg);
                 lignePousseur++;
             }
             break;
+        case 81:
         case KeyEvent.VK_LEFT:
-            System.out.println("Left");
             if (est_possible(y, x-1) && m.action(y, x-1)) {
                 f.tracerSansDelai(tg);
                 colonnePousseur--;
             }
             break;
         default:
-            System.out.println(e.getKeyCode());
+            // System.out.println(e.getKeyCode());
         }
     }
 

@@ -7,12 +7,22 @@ import java.io.InputStream;
 class Terrain {
     private Case [][] terrain;
     private int largeur, hauteur;
+    private int nb_but;
 
     private Terrain() {
     }
 
     public Terrain(InputStream s) {
         lecture(new Scanner(s));
+
+        for(int i=0; i<this.hauteur(); i++){
+            for(int j=0; j<this.largeur(); j++){
+                if(this.consulter(i, j).contient(Case.BUT)){
+                    nb_but++;
+                }
+            }
+        }
+
     }
 
     public Terrain clone() {
@@ -33,7 +43,18 @@ class Terrain {
         nouveau.terrain[2][3] = Case.BUT;
         nouveau.largeur = 5;
         nouveau.hauteur = 5;
+        nouveau.nb_but = 1;
         return nouveau;
+    }
+
+    public boolean fini(){
+    	return nb_but == 0;
+    }
+
+    public void but_atteint(){
+    	if(this.nb_but > 0){
+    		this.nb_but--;
+    	}
     }
 
     public int largeur() {

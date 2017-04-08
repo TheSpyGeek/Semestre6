@@ -15,7 +15,6 @@ public class Sokoban {
         // precedent.
         Random rand;
         Dessin.Parameters.requiresOverdraw = false;
-        int nb_but = 0;
 
         Terrain t = null;
         if (args.length > 0) {
@@ -38,18 +37,13 @@ public class Sokoban {
         f.tracerSansDelai(tg);
 
 
-        for(int i=0; i<t.hauteur(); i++){
-            for(int j=0; j<t.largeur(); j++){
-                if(t.consulter(i, j).contient(Case.BUT)){
-                    nb_but++;
-                }
-            }
-        }
-
-        System.out.println("Il y a "+ nb_but+" but(s)");
         
-        while (nb_but != 0){
+        while (!t.fini()){
             e.waitForEvent();
         }
+
+        System.out.println("Jeu fini");
+        System.out.println("Score = "+m.nb_mouvement);
+        System.exit(0);
     }
 }

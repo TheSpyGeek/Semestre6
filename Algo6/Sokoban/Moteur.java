@@ -5,6 +5,13 @@ class Moteur {
     Terrain t;
     int lignePousseur, colonnePousseur;
 
+    static final int NORD = 1;
+    static final int OUEST = 2;
+    static final int SUD = 3;
+    static final int EST = 4;
+
+    int nb_mouvement;
+
 
     Moteur(Terrain t) {
         this.t = t;
@@ -15,38 +22,42 @@ class Moteur {
                     colonnePousseur = j;
                     return;
                 }
+        this.nb_mouvement = 0;
     }
 
-    private boolean sac_adjacent(int i, int j){
-        if(est_possible(i+1, j) && t.consulter(i+1,j).contient(Case.SAC)){
-            return true;
+    private int sac_adjacent(int i, int j){
+
+        if(est_possible_sans_libre(i+1, j) && lignePousseur == i+1 && colonnePousseur == j){
+            return NORD;
+        } else if(est_possible_sans_libre(i-1, j) && lignePousseur == i-1 && colonnePousseur == j){
+            return SUD;
+        } else if(est_possible_sans_libre(i,j+1) && lignePousseur == i && colonnePousseur == j+1){
+            return OUEST;
+        } else if(est_possible_sans_libre(i, j-1) && lignePousseur == i && colonnePousseur == j-1){
+            return EST;
+        } else {
+            return -1;
         }
-        if(est_possible(i-1, j) && t.consulter(i-1,j).contient(Case.SAC)){
-            return true;
+    }
+    private int val_absolue(int i){
+        if(i<0){
+            return (-1)*i;
+        } else {
+            return i;
         }
-        if(est_possible(i,j+1) && t.consulter(i,j+1).contient(Case.SAC)){
-            return true;
-        }
-        if(est_possible(i, j-1) && t.consulter(i,j-1).contient(Case.SAC)){
-            return true;
-        } 
-        return false;
+    }
+
+    private int deplacement(int i, int j, int k, int l){
+        return val_absolue(i-k) + val_absolue(j-l);
     }
 
     public boolean action(int i, int j) {
+
+        int direction;
         
         if (t.consulter(i,j).estLibre()) {
 
-            // int y = lignePousseur;
-            // int x = colonnePousseur;
-
-            if(t.consulter(i,j).contient(Case.SAC)){
-
-                return false;
-
-            } else if(existe_chemin(lignePousseur, colonnePousseur, i, j)){
-
-                System.out.println("Chemin existant");
+            if(existe_chemin(lignePousseur, colonnePousseur, i, j)){
 
                 Case courante = t.consulter(lignePousseur, colonnePousseur);
                 courante = courante.retrait(Case.POUSSEUR);
@@ -56,17 +67,87 @@ class Moteur {
                 courante = courante.ajout(Case.POUSSEUR);
                 t.assigner(courante, i, j);
 
+                this.nb_mouvement += deplacement(lignePousseur, colonnePousseur, i, j);
+
                 lignePousseur = i;
                 colonnePousseur = j;
 
                 return true;
                 
             } else {
-                System.out.println("chemin impossible");
                 return false;
             }
 
+        } else if(t.consulter(i,j).contient(Case.SAC)){
 
+            direction = sac_adjacent(i, j);
+
+            if(direction != -1){
+
+                Case pousseur = t.consulter(lignePousseur, colonnePousseur);
+                Case sac = t.consulter(i, j);
+                Case c = t.consulter(lignePousseur, colonnePousseur);
+
+
+                if(direction == NORD && est_possible(i-1, j)){
+                    if(t.consulter(i-1, j).contient(Case.BUT)){
+                        sac = sac.retrait(Case.SAC);
+                        t.but_atteint();
+                    }
+                    t.assigner(sac, i-1, j); 
+                    t.assigner(pousseur, i, j);
+                    c = c.retrait(Case.POUSSEUR);
+                    t.assigner(c, lignePousseur, colonnePousseur);
+                    lignePousseur--;
+                    nb_mouvement++;
+                    return true;
+
+                } else if(direction == SUD && est_possible(i+1, j)){
+                    if(t.consulter(i+1, j).contient(Case.BUT)){
+                        sac = sac.retrait(Case.SAC);
+                        t.but_atteint();
+                    }
+                    t.assigner(sac, i+1, j); 
+                    t.assigner(pousseur, i, j);
+                    c = c.retrait(Case.POUSSEUR);
+                    t.assigner(c, lignePousseur, colonnePousseur);
+                    lignePousseur++;
+                    nb_mouvement++;
+                    return true;
+
+                } else if(direction == EST && est_possible(i, j+1)){
+                    if(t.consulter(i, j+1).contient(Case.BUT)){
+                        sac = sac.retrait(Case.SAC);
+                        t.but_atteint();
+                    }
+                    t.assigner(sac, i, j+1); 
+                    t.assigner(pousseur, i, j);
+                    c = c.retrait(Case.POUSSEUR);
+                    t.assigner(c, lignePousseur, colonnePousseur);
+                    colonnePousseur++;
+                    nb_mouvement++;
+                    return true;
+
+                } else if(direction == OUEST && est_possible(i, j-1)){
+                    if(t.consulter(i, j-1).contient(Case.BUT)){
+                        sac = sac.retrait(Case.SAC);
+                        t.but_atteint();
+                    }
+                    t.assigner(sac, i, j-1); 
+                    t.assigner(pousseur, i, j);
+                    c = c.retrait(Case.POUSSEUR);
+                    t.assigner(c, lignePousseur, colonnePousseur);
+                    colonnePousseur--;
+                    nb_mouvement++;
+                    return true;
+
+                } else {
+                    return false;
+                }
+
+            } else {
+                return false;
+            }
 
 
             
@@ -78,6 +159,10 @@ class Moteur {
 
     private boolean est_possible(int i, int j){
         return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0 && t.consulter(i,j).estLibre());
+    }
+
+    private boolean est_possible_sans_libre(int i, int j){
+        return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0);
     }
 
 
