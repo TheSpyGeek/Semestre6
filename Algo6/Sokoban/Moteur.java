@@ -3,7 +3,7 @@ import java.util.*;
 
 class Moteur {
     Terrain t;
-    int lignePousseur, colonnePousseur;
+    int lignePousseur, colonnePousseur, nb_actions = 0;
 
     static final int NORD = 1;
     static final int OUEST = 2;
@@ -71,6 +71,7 @@ class Moteur {
 
                 lignePousseur = i;
                 colonnePousseur = j;
+                nb_actions ++;
 
                 return true;
                 
@@ -164,6 +165,12 @@ class Moteur {
     private boolean est_possible_sans_libre(int i, int j){
         return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0);
     }
+
+
+    public int nombre_actions(){
+        return nb_actions;
+    }
+
 
 
 
