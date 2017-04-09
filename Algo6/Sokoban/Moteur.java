@@ -4,16 +4,16 @@ import java.util.*;
 class Moteur {
     Terrain t;
     int lignePousseur, colonnePousseur, nb_actions = 0;
-<<<<<<< HEAD
 
-    static final int NORD = 1;
+    static final int NORD = 1;  
     static final int OUEST = 2;
     static final int SUD = 3;
     static final int EST = 4;
 
+    int buti, butj;
+    int saci, sacj;
+
     int nb_mouvement;
-=======
->>>>>>> 1997290438e0cfed5127065772841503966e037e
 
 
     Moteur(Terrain t) {
@@ -23,7 +23,12 @@ class Moteur {
                 if (t.consulter(i,j).contient(Case.POUSSEUR)) {
                     lignePousseur = i;
                     colonnePousseur = j;
-                    return;
+                } else if(t.consulter(i, j).contient(Case.BUT)){
+                    this.buti = i;
+                    this.butj = j;
+                } else if(t.consulter(i, j).contient(Case.SAC)){
+                    this.saci = i;
+                    this.sacj = j;
                 }
         this.nb_mouvement = 0;
     }
@@ -159,8 +164,9 @@ class Moteur {
             return false;
         }
     }
-    
 
+
+   
     private boolean est_possible(int i, int j){
         return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0 && t.consulter(i,j).estLibre());
     }
@@ -176,32 +182,11 @@ class Moteur {
 
 
 
-    public int nombre_actions(){
-        return nb_actions;
-    }
-
-
 
 
     public boolean existe_chemin(int i, int j, int buty, int butx){
 
         boolean found = false;
-
-        class Couple {
-            public int i;
-            public int j;
-            Couple(int i, int j){
-                this.i = i;
-                this.j = j;
-            }
-
-            public boolean same(Couple a, Couple b){
-                return (a.i == b.i && a.j == b.j);
-            }
-        }
-
-
-
 
 
         Iterator<Couple> it;
