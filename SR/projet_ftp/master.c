@@ -41,9 +41,9 @@ int main(int argc, char **argv){
     int nb_reponse;
 
     //// TIMEOUT
-    struct timeval timeout;
-    timeout.tv_sec = SHORT_TIMEOUT;
-    timeout.tv_usec = 0;
+    struct timeval short_time;
+    short_time.tv_sec = SHORT_TIMEOUT;
+    short_time.tv_usec = 0;
 
     
     
@@ -89,7 +89,7 @@ int main(int argc, char **argv){
 	    	}
 
 	    	/// attente de réponse
-    		nb_reponse = select(max_fd, &readfd, 0, 0, &timeout);
+    		nb_reponse = select(max_fd, &readfd, 0, 0, &short_time);
 
     		if(nb_reponse > 0){
 
@@ -99,6 +99,12 @@ int main(int argc, char **argv){
 	    				if(info == SLAVE_FINISHED){
 	    					printf("[MASTER] Slave %d finished\n", i);
 	    					busy[i] = 0;
+	    				} else if(info == CLIENT_CRASHED){
+	    					printf("[MASTER] Client of slave %d has crashed\n", i);
+	    					busy[i] = 0;
+	    				} else if(info == CLIENT_CRASHED_DURING_TRANSFERT){
+	    					busy[i] = 0;
+	    					printf("[MASTER] Client has crashed during the transfert\n");
 	    				}
 	    			}
 	    		}

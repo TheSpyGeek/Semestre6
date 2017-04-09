@@ -1,5 +1,6 @@
 
 
+
 #define NB_ESCLAVE 1
 #define MAX_NAME_LEN 256
 
@@ -18,6 +19,8 @@
 
 
 #define SLAVE_FINISHED 0
+#define CLIENT_CRASHED 1
+#define CLIENT_CRASHED_DURING_TRANSFERT 2
 
 #define NOT_BUSY 0
 #define BUSY 1
@@ -26,3 +29,11 @@
 #define ERROR_OPEN 2
 
 #define SHORT_TIMEOUT 3
+#define LONG_TIMEOUT 90
+
+
+//// TIMEOUT
+
+
+
+
