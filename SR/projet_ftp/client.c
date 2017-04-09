@@ -7,10 +7,10 @@
 int slave;
 
 void handler_kill(int sig){
-	// int int_cmd = EXIT;
-	// write(slave, &int_cmd, sizeof(int));
-	// close(slave);
-	// printf("[CLIENT] Deconnection\n");
+	int int_cmd = EXIT;
+	write(slave, &int_cmd, sizeof(int));
+	close(slave);
+	printf("\n[CLIENT] Deconnection\n");
 	exit(0);
 
 }

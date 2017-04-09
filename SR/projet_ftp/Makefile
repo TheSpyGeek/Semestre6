@@ -15,8 +15,8 @@ LDFLAGS =
 #LIBS += -lsocket -lnsl -lrt
 LIBS += -lpthread
 
-INCLUDE = csapp.h define.h parse.h
-OBJS = csapp.o parse.o
+INCLUDE = csapp.h define.h parse.h stock_ip.h
+OBJS = csapp.o parse.o stock_ip.o
 INCLDIR = -I.
 
 PROGS = master slave client
