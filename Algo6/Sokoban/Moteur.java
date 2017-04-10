@@ -210,77 +210,15 @@ class Moteur {
         //les opposés des mur ne sont pas des solutions
 
         //cas du coin supérieur gauche
-        if(x == 0 && y ==0){
-            fx_sud =fx(sud.i, sud.j);
-            fx_est = fx(est.i,est.j))
-            if(fx_sud < fx_est)<{
-                    C.add(sud);
-                }
-            else if(fx_sud = fx_est){
-                C.add(est);
-                C.add(sud);
-            }
-            else{
-                C.add(est);
-            }
-             
-            
-        }
-        //cas du coin supérieur droite
-        if(x == largeur && y ==0){
-            fx_sud =fx(sud.i, sud.j);
-            fx_ouest = fx(ouest.i,ouest.j))
-            if(fx_sud < fx_ouest)<{
-                    C.add(sud);
-                }
-            else if(fx_sud = fx_ouest){
-                C.add(ouest);
-                C.add(sud);
-            }
-            else{
-                C.add(ouest);
-            }
-             
-            
-        }
-        //cas du coin inférieur gauche
-        if(x == 0 && y ==t.hauteur){
-            fx_nord =fx(nord.i, nord.j);
-            fx_est = fx(est.i,est.j))
-            if(fx_nord < fx_est)<{
-                    C.add(nord);
-                }
-            else if(fx_nord = fx_ouest){
-                C.add(est);
-                C.add(nord);
-            }
-            else{
-                C.add(est);
-            }
-             
-            
-        }
-        //cas du coin supérieur gauche
-        if(x == 0 && y ==0){
-            fx_nord =fx(nord.i, nord.j);
-            fx_ouest = fx(ouest.i,ouest.j))
-            if(fx_sud < fx_est)<{
-                    C.add(nord);
-                }
-            else if(fx_nord = fx_ouest){
-                C.add(ouest);
-                C.add(nord);
-            }
-            else{
-                C.add(ouest);
-            }
+        if(x == 0 && y ==0 || x == largeur && y ==0 || x == 0 && y ==t.hauteur || x == t.largeur && y ==t.hauteur){
+           //remains the list empty
              
             
         }
 
         //cas  bordure supérieur
         else if(y == 0){
-            fx_sud =fx(sud.i, sud.j);
+           
             fx_est = fx(est.i,est.j))
             fx_ouest = fx(ouest.i, ouest.j);
 
@@ -289,173 +227,89 @@ class Moteur {
                 if {fx_sud < fx_ouest) {
                     C.add(sud);
                 }
-                else if(fx_est = fx_sud){
-                    C.add(est);
-                    C.add(ouest);
-                    
-                }
+              else if(fx_ouest< fx_est){
+
+					C.add(ouest);
+				}
+				else
+					C.add(est)
 
 
             }
 
-            else if (fx_ouest = fx_sud){
-                if(fx_est < fx_ouest){
-                    C.add(est)
-                }
-                else{
-                    C.add(sud);
-                    C.add(ouest);
-                }
-            }
-
-
-
-            else if(fx_est = fx_sud){
-                if(fx_ouest < fx_sud){
-                    C.add(ouest);
-                }
-                else{
-                    C.add(est);
-                    C.add(sud);
-                }
-            }
 
         }
 
     //cas bordure inférieur
      else if(y == t.hauteur){
-            fx_nord =fx(nord.i, nord.j);
+    
             fx_est = fx(est.i,est.j))
             fx_ouest = fx(ouest.i, ouest.j);
 
-            if(fx_ouest = fx_est){
-
-                if {fx_sud < fx_ouest) {
-                    C.add(nord);
-                }
-                else if(fx_est = fx_sud){
+           
+                if(fx_est = fx_ouest){
                     C.add(est);
                     C.add(ouest);
                     
                 }
 
-
-            }
-
-            else if (fx_ouest = fx_nord){
-                if(fx_est < fx_ouest){
+                else if(fx_est < fx_ouest){
                     C.add(est)
                 }
                 else{
-                    C.add(nord);
                     C.add(ouest);
-                }
-            }
 
-
-
-            else if(fx_est = fx_nord){
-                if(fx_ouest < fx_snord{
-                    C.add(ouest);
-                }
-                else{
-                    C.add(est);
-                    C.add(nord);
-                }
-            }
+            
 
         }
 
         //cas bordure la plus à gauche
          else if(x ==0){
             fx_nord =fx(nord.i, nord.j);
-            fx_est = fx(est.i,est.j))
+            
             fx_sud = fx(sud.i, sud.j);
 
-            if(fx_sud = fx_est){
 
                 if {fx_sud < fx_nord) {
-                    C.add(nord);
-                }
-                else if(fx_est = fx_sud){
-                    C.add(est);
                     C.add(sud);
-                    
                 }
-
-
-            }
-
-
-            else if (fx_sud = fx_nord){
-                if(fx_est < fx_sud){
-                    C.add(est)
-                }
-                else{
+                else if(fx_sud = fx_nord){
+               
                     C.add(nord);
                     C.add(sud);
                 }
-            }
+				else
+					C.add(nord);
+           }
 
 
 
-            else if(fx_est = fx_nord){
-                if(fx_ouest < fx_snord{
-                    C.add(sud);
-                }
-                else{
-                    C.add(est);
-                    C.add(nord);
-                }
-            }
-
-        }
+            
 
         //cas bordure la plus à droite
          else if(x=t.largeur){
             fx_nord =fx(nord.i, nord.j);
-            fx_ouest = fx(ouest.i,ouest.j))
             fx_sud = fx(sud.i, sud.j);
 
-            if(fx_sud = fx_ouest){
+             fx_nord =fx(nord.i, nord.j);
+            
+            fx_sud = fx(sud.i, sud.j);
+
 
                 if {fx_sud < fx_nord) {
-                    C.add(nord);
-                }
-                else if(fx_ouest = fx_sud){
-                    C.add(ouest);
                     C.add(sud);
-                    
                 }
-
-
-            }
-        
-
-            else if (fx_sud = fx_nord){
-                if(fx_est < fx_sud){
-                    C.add(ouest)
-                }
-                else{
+                else if(fx_sud = fx_nord){
+               
                     C.add(nord);
                     C.add(sud);
                 }
-            }
-
-
-
-            else if(fx_ouest = fx_nord){
-                if(fx_ouest < fx_snord{
-                    C.add(sud);
-                }
-                else{
-                    C.add(ouest);
-                    C.add(nord);
-                }
-            }
+				else
+					C.add(nord);
 
         }
 
+		//cas général
         else {
             fx_nord =fx(nord.i, nord.j);
             fx_ouest = fx(ouest.i,ouest.j))
@@ -464,11 +318,19 @@ class Moteur {
 
             if(fx_sud = fx_ouest){
 
-                if {fx_sud < fx_sud) {
-                    if(fx.)
-                    C.add(nord);
+                if {fx_nord < fx_sud) {
+                    if(fx_ouest < fx_nord){
+                    	C.add(ouest);
+					}
+					else if(fx_ouest = fx_nord){
+						C.add(ouest)
+						C.add(nord);
+					}
+					else
+						C.add(nord);
                 }
-                else if(fx_ouest = fx_sud){
+                else if(fx_nord = fx_sud){
+					
                     C.add(ouest);
                     C.add(sud);
                     
