@@ -28,13 +28,14 @@ public class Sokoban {
             t = Terrain.defaut();
 
         f.setDrawAreaSize(50*t.largeur(),50*t.hauteur());
-        Moteur m = new Moteur(t);
         TerrainGraphique tg = new TerrainGraphique(f, t);
+        Moteur m = new Moteur(t, f);
 
         e.addMouseListener(new EcouteurDeSouris(f, tg, m));
         e.addKeyListener(new EcouteurDeClavier(f, t, tg, m));
 
         f.tracerSansDelai(tg);
+        m.Explorer();
 
 
         

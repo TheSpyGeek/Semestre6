@@ -1,10 +1,16 @@
 
 import java.util.*;
+import java.awt.Color;
+import Dessin.Fenetre;
 
 //  DES COMMENTAIRES PLS
 
 class Moteur {
+    Fenetre f;
     Terrain t;
+    Terrain t_chemin;
+    TerrainGraphique tg;
+    TerrainGraphique tg_chemin;
     int lignePousseur, colonnePousseur, nb_actions = 0;
 
     static final int NORD = 1;  
@@ -18,8 +24,12 @@ class Moteur {
     int nb_mouvement;
 
 
-    Moteur(Terrain t) {
+    Moteur(Terrain t, Fenetre f) {
+        this.f = f;
         this.t = t;
+        this.t_chemin = t;
+        this.tg = new TerrainGraphique(f, t);
+        this.tg_chemin = new TerrainGraphique(f, t_chemin);
         for (int i=0; i<t.hauteur(); i++)
             for (int j=0; j<t.largeur(); j++)
                 if (t.consulter(i,j).contient(Case.POUSSEUR)) {
@@ -82,6 +92,7 @@ class Moteur {
                 lignePousseur = i;
                 colonnePousseur = j;
                 nb_actions ++;
+
 
                 return true;
                 
@@ -170,11 +181,16 @@ class Moteur {
 
    
     private boolean est_possible(int i, int j){
-        return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0 && t.consulter(i,j).estLibre());
+        return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0 && t_chemin.consulter(i,j).estLibre());
     }
 
     private boolean est_possible_sans_libre(int i, int j){
         return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0);
+    }
+
+    private boolean est_possible_sans_pousseur(int i, int j){
+        return (j < t.largeur() && j >= 0 && i < t.hauteur() && i >= 0 && !t_chemin.consulter(i, j).contient(Case.SAC) && !t_chemin.consulter(i, j).contient(Case.SAC_SUR_BUT)
+            && !t_chemin.consulter(i, j).contient(Case.OBSTACLE) && !t_chemin.consulter(i, j).contient(Case.INVALIDE));
     }
 
 
@@ -189,61 +205,44 @@ class Moteur {
 
     }
 
-    private int nb_deplacement(int x, int y){
-        return val_absolue(saci-x) + val_absolue(sacj-y);        
-    }
+    // private int nb_deplacement(int x, int y){
+    //     return val_absolue(saci-x) + val_absolue(sacj-y);        
+    // }
 
-    private int fx(int x, int y){
-        return heuristique(x,y) + nb_deplacement(x,y);
-    }
+    // private int fx(int x, int y){
+    //     return heuristique(x,y) + nb_deplacement(x,y);
+    // }
 
 
-    private ArrayList<Couple> successeurs(int x, int y) {
+    private ArrayList<Sac_Perso> successeurs(Sac_Perso combi, int nb_deplacement) {
 
-        ArrayList<Couple> C = new ArrayList<Couple>();
+        Couple perso = new Couple(combi.perso.i, combi.perso.j);
+        Couple perso_deplace = new Couple(combi.sac.i, combi.sac.j);
+
+        ArrayList<Sac_Perso> C = new ArrayList<Sac_Perso>();
         Couple nord, sud, ouest, est;
-        nord = new Couple(y-1, x);
-        sud = new Couple(y+1, x);
-        ouest = new Couple(y,x-1);
-        est = new Couple(y,x+1);
+        nord = new Couple(combi.sac.i-1, combi.sac.j);
+        sud = new Couple(combi.sac.i+1, combi.sac.j);
+        ouest = new Couple(combi.sac.i, combi.sac.j-1);
+        est = new Couple(combi.sac.i, combi.sac.j+1);
 
-        if(est_possible(y, x-1)){
-            C.add(ouest);
-        }        
-        if(est_possible(y, x+1)){
-            C.add(est);
+        if(est_possible_sans_pousseur(nord.i, nord.j) && existe_chemin(combi.perso.i, combi.perso.j, nord.i, nord.j) && est_possible_sans_pousseur(sud.i, sud.j)){
+            C.add(new Sac_Perso(sud, perso_deplace, nb_deplacement + heuristique(sud.i, sud.j)));
         }
-        if(est_possible(y+1, x)){
-            C.add(sud);
+        if(est_possible_sans_pousseur(sud.i, sud.j) && existe_chemin(combi.perso.i, combi.perso.j, sud.i, sud.j) && est_possible_sans_pousseur(nord.i, nord.j)){
+            C.add(new Sac_Perso(nord, perso_deplace, nb_deplacement + heuristique(nord.i, nord.j)));
         }
-        if(est_possible(y-1, x)){
-            C.add(nord);
+        if(est_possible_sans_pousseur(est.i, est.j) && existe_chemin(combi.perso.i, combi.perso.j, est.i, est.j) && est_possible_sans_pousseur(ouest.i, ouest.j)){
+            C.add(new Sac_Perso(ouest, perso_deplace, nb_deplacement + heuristique(ouest.i, ouest.j)));
+        }
+        if(est_possible_sans_pousseur(ouest.i, ouest.j) && existe_chemin(perso.i, perso.j, ouest.i, ouest.j) && est_possible_sans_pousseur(est.i, est.j)){
+            C.add(new Sac_Perso(est, perso_deplace, nb_deplacement + heuristique(est.i, est.j)));
         }
 
         return C;
     }
 
-    private ArrayList<Couple> successeurs_test(int x, int y) {
-
-        ArrayList<Couple> C = new ArrayList<Couple>();
-        Couple nord, sud, ouest, est;
-        nord = new Couple(y-1, x);
-        sud = new Couple(y+1, x);
-        ouest = new Couple(y,x-1);
-        est = new Couple(y,x+1);
-
-        if(est_possible(nord.i, nord.j) && est_possible(sud.i, sud.j)){
-            C.add(sud);
-            C.add(nord);
-        }        
-        if(est_possible(est.i, est.j) && est_possible(ouest.i, ouest.j)){
-            C.add(est);
-            C.add(ouest);
-        }
-
-        return C;
-    }
-
+    
     static public int max(int a, int b){
         if(a > b){
             return a;
@@ -253,32 +252,70 @@ class Moteur {
     }
 		
 
-    public Dijkstra (){
-        int p = 99999;
-        int pz;
-        int index_z;
-        file_a_priorite Fap = new file_a_priorite();
-        int [] P = new int[max(t.hauteur,t.largeur)+1];
-        Fap.inserer(saci,sacj,0);
-        Couple c, suc;
-        ArrayList<Couple> succ = new ArrayList<Couple>();
+    public void Explorer(){
+
+
+        file_a_priorite fap = new file_a_priorite();
+
+        Sac_Perso combi = new Sac_Perso(saci, sacj, lignePousseur, colonnePousseur, heuristique(saci, sacj));
+        Sac_Perso current;
+        // int [] poids = new int[max(t.hauteur(),t.largeur())+1];
+        // poids[0] = 0;
+
+        int poids;
+        Couple perso = new Couple(lignePousseur, colonnePousseur);
+        Couple sac = new Couple(saci, sacj);
+
+        int nb_deplacement = 0;
+
+
+
+        fap.Inserer(combi);
+
+        ArrayList<Sac_Perso> succ = new ArrayList<Sac_Perso>();
+
         do {
-        	c = Fap.extraire;
+            t_chemin.assigner(Case.LIBRE, perso.i, perso.j);
+            t_chemin.assigner(Case.LIBRE, sac.i, sac.j);
 
-            succ = successeurs(c.j,c.i);
+            current = fap.Extraire();
+            perso = current.perso;
+            sac = current.sac;
+            t_chemin.assigner(Case.POUSSEUR, perso.i, perso.j);
+            t_chemin.assigner(Case.SAC, sac.i, sac.j);
 
-            for(int i = 0; i < succ.size(); i++){
-                Couple z = succ.get(i);
+            System.out.println("Current = "+current+" Nombre deplacement sac = "+nb_deplacement);
+            nb_deplacement++;
+            succ = successeurs(current, nb_deplacement);
 
-            	succ.remove(i);
+            for(int i=0; i<succ.size(); i++){
 
-            	pz = fx(c.i,c.j) + 1;
-            	if pz < P([z] {
-            		P(z) =pz;
-            		Fap.inserer(z.i,z.j, pz);
-            	}
+                Sac_Perso z = succ.get(i);
+                // System.out.println("Z = "+z);
+
+                // poids = current.poids+1;
+
+                // if(poids < z.poids){
+                //     z.poids = poids;
+                    // pred[z] = current; pour faire le chemin j'imagine
+                    fap.Inserer(z);
+                    tg_chemin.setStatut(Color.green, z.sac.i, z.sac.j);
+
+
+                // }
             }
-        }while(y = (buti, butj) );
+
+            f.tracer(tg_chemin);
+
+        } while(!fap.Est_Vide() && (current.sac.i != buti || current.sac.j != butj));
+
+        System.out.println("Fap vide "+fap.Est_Vide());
+
+        if(current.sac.i == buti && current.sac.j == butj){
+            System.out.println("Solution trouvé !!!");
+        } else {
+            System.out.println("Solution non trouvé");
+        }
 
 
 
@@ -293,15 +330,20 @@ class Moteur {
 
         boolean found = false;
 
+        if(i == buty && j == butx){
+            return true;
+        }
+
 
         Iterator<Couple> it;
+
 
         ArrayList<Couple> ens = new ArrayList<Couple>();
         Couple c, but;
 
         but = new Couple(buty, butx);
 
-        boolean [][] marqued = new boolean[t.hauteur()][t.largeur()];
+        boolean [][] marqued = new boolean[t_chemin.hauteur()][t_chemin.largeur()];
         for(int k=0; k<t.hauteur();k++){
             for(int l=0; l<t.largeur();l++){
                 marqued[k][l] = false;

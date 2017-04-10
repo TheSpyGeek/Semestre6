@@ -9,4 +9,10 @@ class Couple {
     public boolean same(Couple a, Couple b){
         return (a.i == b.i && a.j == b.j);
     }
+
+    public String toString(){
+    	String renvoi = "";
+    	renvoi += "("+i+", "+j+")";
+    	return renvoi;
+    }
 }
