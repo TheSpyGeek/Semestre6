@@ -1,6 +1,8 @@
 
 import java.util.*;
 
+//  DES COMMENTAIRES PLS
+
 class Moteur {
     Terrain t;
     int lignePousseur, colonnePousseur, nb_actions = 0;
@@ -180,6 +182,344 @@ class Moteur {
         return nb_actions;
     }
 
+
+    private int heuristique(int x, int y){
+
+        return val_absolue(x-buti) + val_absolue(y-butj);
+
+    }
+
+    private int nb_deplacement(int x, int y){
+        return val_absolue(saci-x) + val_absolue(sacj-y);        
+    }
+
+    private int fx(int x, int y){
+        return heuristique(x,y) + nb_deplacement(x,y);
+    }
+
+    private  ArrayList<Couple> succ(int x, int y) {
+        ArrayList<Couple> C = new ArrayList<Couple>;
+        Couple nord, sud, ouest, est;
+        nord = new Couple(y, x-1);
+        sud = new Couple(y, x+1);
+        ouest= new Couple(y-1,x);
+        est = new Couple(y+,x);
+        int fx_sud, fx_nord,fx_est, fx_ouest;
+
+        //  refaire coin meme cas file vide
+        //les opposés des mur ne sont pas des solutions
+
+        //cas du coin supérieur gauche
+        if(x == 0 && y ==0){
+            fx_sud =fx(sud.i, sud.j);
+            fx_est = fx(est.i,est.j))
+            if(fx_sud < fx_est)<{
+                    C.add(sud);
+                }
+            else if(fx_sud = fx_est){
+                C.add(est);
+                C.add(sud);
+            }
+            else{
+                C.add(est);
+            }
+             
+            
+        }
+        //cas du coin supérieur droite
+        if(x == largeur && y ==0){
+            fx_sud =fx(sud.i, sud.j);
+            fx_ouest = fx(ouest.i,ouest.j))
+            if(fx_sud < fx_ouest)<{
+                    C.add(sud);
+                }
+            else if(fx_sud = fx_ouest){
+                C.add(ouest);
+                C.add(sud);
+            }
+            else{
+                C.add(ouest);
+            }
+             
+            
+        }
+        //cas du coin inférieur gauche
+        if(x == 0 && y ==t.hauteur){
+            fx_nord =fx(nord.i, nord.j);
+            fx_est = fx(est.i,est.j))
+            if(fx_nord < fx_est)<{
+                    C.add(nord);
+                }
+            else if(fx_nord = fx_ouest){
+                C.add(est);
+                C.add(nord);
+            }
+            else{
+                C.add(est);
+            }
+             
+            
+        }
+        //cas du coin supérieur gauche
+        if(x == 0 && y ==0){
+            fx_nord =fx(nord.i, nord.j);
+            fx_ouest = fx(ouest.i,ouest.j))
+            if(fx_sud < fx_est)<{
+                    C.add(nord);
+                }
+            else if(fx_nord = fx_ouest){
+                C.add(ouest);
+                C.add(nord);
+            }
+            else{
+                C.add(ouest);
+            }
+             
+            
+        }
+
+        //cas  bordure supérieur
+        else if(y == 0){
+            fx_sud =fx(sud.i, sud.j);
+            fx_est = fx(est.i,est.j))
+            fx_ouest = fx(ouest.i, ouest.j);
+
+            if(fx_ouest = fx_est){
+
+                if {fx_sud < fx_ouest) {
+                    C.add(sud);
+                }
+                else if(fx_est = fx_sud){
+                    C.add(est);
+                    C.add(ouest);
+                    
+                }
+
+
+            }
+
+            else if (fx_ouest = fx_sud){
+                if(fx_est < fx_ouest){
+                    C.add(est)
+                }
+                else{
+                    C.add(sud);
+                    C.add(ouest);
+                }
+            }
+
+
+
+            else if(fx_est = fx_sud){
+                if(fx_ouest < fx_sud){
+                    C.add(ouest);
+                }
+                else{
+                    C.add(est);
+                    C.add(sud);
+                }
+            }
+
+        }
+
+    //cas bordure inférieur
+     else if(y == t.hauteur){
+            fx_nord =fx(nord.i, nord.j);
+            fx_est = fx(est.i,est.j))
+            fx_ouest = fx(ouest.i, ouest.j);
+
+            if(fx_ouest = fx_est){
+
+                if {fx_sud < fx_ouest) {
+                    C.add(nord);
+                }
+                else if(fx_est = fx_sud){
+                    C.add(est);
+                    C.add(ouest);
+                    
+                }
+
+
+            }
+
+            else if (fx_ouest = fx_nord){
+                if(fx_est < fx_ouest){
+                    C.add(est)
+                }
+                else{
+                    C.add(nord);
+                    C.add(ouest);
+                }
+            }
+
+
+
+            else if(fx_est = fx_nord){
+                if(fx_ouest < fx_snord{
+                    C.add(ouest);
+                }
+                else{
+                    C.add(est);
+                    C.add(nord);
+                }
+            }
+
+        }
+
+        //cas bordure la plus à gauche
+         else if(x ==0){
+            fx_nord =fx(nord.i, nord.j);
+            fx_est = fx(est.i,est.j))
+            fx_sud = fx(sud.i, sud.j);
+
+            if(fx_sud = fx_est){
+
+                if {fx_sud < fx_nord) {
+                    C.add(nord);
+                }
+                else if(fx_est = fx_sud){
+                    C.add(est);
+                    C.add(sud);
+                    
+                }
+
+
+            }
+
+
+            else if (fx_sud = fx_nord){
+                if(fx_est < fx_sud){
+                    C.add(est)
+                }
+                else{
+                    C.add(nord);
+                    C.add(sud);
+                }
+            }
+
+
+
+            else if(fx_est = fx_nord){
+                if(fx_ouest < fx_snord{
+                    C.add(sud);
+                }
+                else{
+                    C.add(est);
+                    C.add(nord);
+                }
+            }
+
+        }
+
+        //cas bordure la plus à droite
+         else if(x=t.largeur){
+            fx_nord =fx(nord.i, nord.j);
+            fx_ouest = fx(ouest.i,ouest.j))
+            fx_sud = fx(sud.i, sud.j);
+
+            if(fx_sud = fx_ouest){
+
+                if {fx_sud < fx_nord) {
+                    C.add(nord);
+                }
+                else if(fx_ouest = fx_sud){
+                    C.add(ouest);
+                    C.add(sud);
+                    
+                }
+
+
+            }
+        
+
+            else if (fx_sud = fx_nord){
+                if(fx_est < fx_sud){
+                    C.add(ouest)
+                }
+                else{
+                    C.add(nord);
+                    C.add(sud);
+                }
+            }
+
+
+
+            else if(fx_ouest = fx_nord){
+                if(fx_ouest < fx_snord{
+                    C.add(sud);
+                }
+                else{
+                    C.add(ouest);
+                    C.add(nord);
+                }
+            }
+
+        }
+
+        else {
+            fx_nord =fx(nord.i, nord.j);
+            fx_ouest = fx(ouest.i,ouest.j))
+            fx_sud = fx(sud.i, sud.j);
+            fx_est = fx(est.i,est.j);
+
+            if(fx_sud = fx_ouest){
+
+                if {fx_sud < fx_sud) {
+                    if(fx.)
+                    C.add(nord);
+                }
+                else if(fx_ouest = fx_sud){
+                    C.add(ouest);
+                    C.add(sud);
+                    
+                }
+
+
+            }
+        
+
+            else if (fx_sud = fx_nord){
+                if(fx_est < fx_sud){
+                    C.add(ouest)
+                }
+                else{
+                    C.add(nord);
+                    C.add(sud);
+                }
+            }
+
+
+
+            else if(fx_ouest = fx_nord){
+                if(fx_ouest < fx_snord{
+                    C.add(sud);
+                }
+                else{
+                    C.add(ouest);
+                    C.add(nord);
+                }
+            }
+
+        }
+
+            
+    }
+
+
+
+    public Dijkstra (){
+        p = 
+        file_a_priorite Fap = new file_a_priorite();
+        int [] P = new int[max(t.hauteur,t.largeur)+1];
+        Fap.inserer(saci,sacj,0);
+        Couple c;
+        do {
+            c = Fap.extraire;
+        }
+
+
+
+    }
 
 
 

@@ -19,7 +19,7 @@ class file_a_priorite {
 		file.add(e);
 	}
 
-	public void Inserer(int i, int j, int prio){
+	public void Inserer(Couple i, int j, int prio){
 		Element e = new Element(i, j, prio);
 		file.add(e);
 	}
