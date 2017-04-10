@@ -1,15 +1,17 @@
 
-#include "define.h"
 #include "csapp.h"
+#include "define.h"
+#include "stock_ip.h"
 
 #include <sys/select.h>
 
 int fd_slave[NB_ESCLAVE];
 int busy[NB_ESCLAVE];
 int tube[2];
+int listenfd;
 
 fd_set readfd;
-
+node_t * unfinished_transfert = NULL;
 
 
 
@@ -21,15 +23,20 @@ void handler_kill(int sig);
 int slave_not_busy();
 
 int fd_max(); // calcul de fd maximum dans le tableau des esclaves + tube[0]
+void register_crash_transfert(int i);
+int attente_reponse(int fd, int time);
+
+void envoi_info_crash(int id, char ip[INET_ADDRSTRLEN]);
 
 int main(int argc, char **argv){
 
-    int listenfd;
     socklen_t clientlen;
     struct sockaddr_in clientaddr;
     int clientfd;
     int id_slave;
     int info;
+
+
 
 
     char client_hostname[MAX_NAME_LEN];
@@ -44,13 +51,6 @@ int main(int argc, char **argv){
     struct timeval short_time;
     short_time.tv_sec = SHORT_TIMEOUT;
     short_time.tv_usec = 0;
-
-    
-    
-    
-
-    
-
 
     // connection des serveurs esclaves
     listenfd = Open_listenfd(SLAVE_PORT);
@@ -105,6 +105,16 @@ int main(int argc, char **argv){
 	    				} else if(info == CLIENT_CRASHED_DURING_TRANSFERT){
 	    					busy[i] = 0;
 	    					printf("[MASTER] Client has crashed during the transfert\n");
+	    					info = OK;
+	    					write(fd_slave[i], &info, sizeof(int));
+
+	    					//// RECUPERATION DES INFOS DU CRASH
+	    					//// NOMBRE DE BYTES TRANSEFERES
+
+	    					register_crash_transfert(i);
+	    					
+	    					// affichage des transferts non fini
+	    					// print_list(unfinished_transfert);
 	    				}
 	    			}
 	    		}
@@ -119,6 +129,38 @@ int main(int argc, char **argv){
 
 	    				write(fd_slave[id_slave], client_ip_string, INET_ADDRSTRLEN);
 	    				busy[id_slave] = 1;
+
+	    				if(attente_reponse(fd_slave[id_slave], SHORT_TIMEOUT)){
+
+	    					read(fd_slave[id_slave], &info, sizeof(int));
+	    					if(info == OK){
+
+	    						if(contain(&unfinished_transfert, client_ip_string)){
+	    							info = CLIENT_CRASHED;
+	    							write(fd_slave[id_slave], &info, sizeof(int));
+
+	    							if(attente_reponse(fd_slave[id_slave], SHORT_TIMEOUT)){
+	    								read(fd_slave[id_slave], &info, sizeof(int));
+	    								if(info == OK){
+
+	    									envoi_info_crash(id_slave, client_ip_string);
+	    									remove_by_ip(&unfinished_transfert, client_ip_string);
+	    								}
+	    							} else {
+				    					printf("[MASTER] Slave %d crashed\n", id_slave);
+				    				}
+
+	    								
+	    						} else {
+	    							envoi_info(fd_slave[id_slave], DEFAULT);
+	    						}
+	    					} else {
+	    						printf("[MASTER] Problem with slave %d\n", id_slave);
+	    					}
+
+	    				} else {
+	    					printf("[MASTER] Slave %d crashed\n", id_slave);
+	    				}
 
 
 	    			} else {
@@ -152,41 +194,81 @@ int main(int argc, char **argv){
 
     }
 
-    /*while(1){
-    	id_slave = slave_not_busy();
-    	printf("Slave = %d\n", id_slave);
-    	if(id_slave != -1){
+}
 
+void envoi_info_crash(int id, char ip[INET_ADDRSTRLEN]){
 
-	    	// clientlen = (socklen_t)sizeof(clientaddr);
-	    	// printf("Client : hostname : %s IP : (%s)\n", client_hostname, client_ip_string);
+	char *filename;
+	int nb_bytes;
+	int info;
 
+	filename = file_name(&unfinished_transfert, ip);
+	nb_bytes = bytes(&unfinished_transfert, ip);
 
-	    	printf("Info sent\n");
-	    	info = OPEN_CLIENT;
-	    	write(fd_slave[id_slave], &info, sizeof(int));
+	write(fd_slave[id], filename, strlen(filename));
 
-	    	read(fd_slave[id_slave], &info, sizeof(int));
+	if(attente_reponse(fd_slave[id], SHORT_TIMEOUT)){
 
-	    	if(info == OK){
-	    		write(fd_slave[id_slave], &clientaddr, clientlen);	
-	    	} else {
-	    		printf("Erreur connection du slave %d\n", id_slave);
-	    	}
-    		
-    	}
+		read(fd_slave[id], &info, sizeof(int));
 
-    }*/
+		if(info == OK){
+
+			write(fd_slave[id], &nb_bytes, sizeof(int));
+			printf("[MASTER] Info about crash sent to slave %d\n", id);
+
+		} else {
+			printf("[MASTER] Problem with Slave %d\n", id);
+		}
+	} else {
+		printf("[MASTER] Slave %d has crashed\n", id);
+	}
 
 
 
 }
 
 
+void register_crash_transfert(int i){
+
+	char ip_client_crashed[INET_ADDRSTRLEN];
+    int nb_bytes_crashed;
+    char filename_client_crashed[MAXLINE];
+    int nb_char;
+    int info;
+
+	if(attente_reponse(fd_slave[i], SHORT_TIMEOUT) > 0){
+		nb_char = read(fd_slave[i], ip_client_crashed, INET_ADDRSTRLEN);
+		ip_client_crashed[nb_char+1] = '\0';
+		info = OK;
+		write(fd_slave[i], &info, sizeof(int));
+
+		if(attente_reponse(fd_slave[i], SHORT_TIMEOUT) > 0){
+			nb_char = read(fd_slave[i], &nb_bytes_crashed, sizeof(int));
+			info = OK;
+			write(fd_slave[i], &info, sizeof(int));
+
+			if(attente_reponse(fd_slave[i], SHORT_TIMEOUT) > 0){
+				nb_char = read(fd_slave[i], filename_client_crashed, MAXLINE);
+				filename_client_crashed[nb_char+1] = '\0';
+
+				// ajout dans la liste
+				add(&unfinished_transfert, ip_client_crashed, nb_bytes_crashed, filename_client_crashed);
+				printf("[MASTER] Crash registered\n");
+			} else {
+				printf("[MASTER] Slave %d has crashed\n", i);
+			}
+		} else {
+			printf("[MASTER] Slave %d has crashed\n", i);
+		}
+	} else {
+		printf("[MASTER] Slave %d has crashed\n", i);
+	}
+
+}
+
+
+
 //renvoie 1 si fd est occupé sinon 0
-
-
-
 int slave_not_busy(){
 	for(int i=0; i<NB_ESCLAVE; i++){
 		if(!busy[i]){
@@ -199,8 +281,9 @@ int slave_not_busy(){
 
 void handler_kill(int sig){
 	printf("Shutdown server\n");
+	close(listenfd);
 	for(int i=0; i<NB_ESCLAVE; i++){
-		Close(fd_slave[i]);
+		close(fd_slave[i]);
 	}
 	exit(0);
 }
@@ -220,3 +303,17 @@ int fd_max(){
 	return fd;
 }
 
+
+int attente_reponse(int fd, int time){
+
+	fd_set readfd;
+
+	struct timeval timeout;
+	timeout.tv_sec = time;
+	timeout.tv_usec = 0;
+
+	FD_ZERO(&readfd);
+	FD_SET(fd, &readfd);
+	return (select(fd+1, &readfd, 0, 0, &timeout));
+
+}

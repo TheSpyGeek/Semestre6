@@ -19,8 +19,9 @@
 
 
 #define SLAVE_FINISHED 0
-#define CLIENT_CRASHED 1
+#define CLIENT_CRASHED 4
 #define CLIENT_CRASHED_DURING_TRANSFERT 2
+#define DEFAULT 3
 
 #define NOT_BUSY 0
 #define BUSY 1
@@ -32,8 +33,10 @@
 #define LONG_TIMEOUT 90
 
 
-//// TIMEOUT
-
+void envoi_info(int fd, int info){
+	int cpy = info;
+	write(fd, &cpy, sizeof(int));
+}
 
 
 

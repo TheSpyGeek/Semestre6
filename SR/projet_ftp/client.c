@@ -7,42 +7,44 @@
 int slave;
 
 void handler_kill(int sig){
-	// int int_cmd = EXIT;
-	// write(slave, &int_cmd, sizeof(int));
-	// close(slave);
-	// printf("[CLIENT] Deconnection\n");
+	int int_cmd = EXIT;
+	write(slave, &int_cmd, sizeof(int));
+	close(slave);
+	printf("\n[CLIENT] Deconnection\n");
+	// printf("CRASH\n");
 	exit(0);
 
 }
 
 
-int attente_reponse(int fd, int time){
+int attente_reponse(int fd, int time);
 
-	fd_set readfd;
+int attente_reponse_tres_court(int fd);
 
-	struct timeval timeout;
-	timeout.tv_sec = time;
-	timeout.tv_usec = 0;
+void reception_donnees_crash();
 
-	FD_ZERO(&readfd);
-	FD_SET(fd, &readfd);
-	return (select(fd+1, &readfd, 0, 0, &timeout));
-
-}
-
+void reception_fichier(int file, int nb, int nb_octets);
 
 int main(int argc, char **argv){
 
-	char host[] = "thespygeek";
+	char host[INET_ADDRSTRLEN];
 	int clientfd, listenfd;
 	int int_cmd, info;
 	char cmd[MAXLINE];
-	char buf[MAXLINE];
 	char **cmd_parsed;
     socklen_t clientlen;
     struct sockaddr_in clientaddr;
-    int nb_octets, n, nb;
+    int nb_octets;
     int file;
+    int n;
+    char buf[MAXLINE];
+
+    if(argc < 2){
+    	strcpy(host, "localhost");
+    } else {
+    	strcpy(host, argv[1]);
+    }
+
 
     signal(SIGINT, handler_kill);
 
@@ -54,9 +56,30 @@ int main(int argc, char **argv){
 	listenfd = Open_listenfd(SLAVE_TO_CLIENT);
 
 	slave = Accept(listenfd, (SA *)&clientaddr, &clientlen);
-
 	close(clientfd);
+
+
 	printf("Connected to slave\n");
+
+	if(attente_reponse(slave, SHORT_TIMEOUT)){
+		read(slave, &info, sizeof(int));
+
+		/// si le client a crash il doit reprendre le téléchargement du fichier
+		if(info == CLIENT_CRASHED_DURING_TRANSFERT){
+
+			envoi_info(slave, OK);
+			reception_donnees_crash();
+		} else if(info == DEFAULT){
+
+		}
+
+
+
+	} else {
+		printf("[CLIENT] Slave has crashed\n");
+		close(slave);
+		exit(0);
+	}
 
 
 	while(1){
@@ -81,10 +104,42 @@ int main(int argc, char **argv){
 					break;
 				case LS:
 					write(slave, &int_cmd, sizeof(int));
-					// while((n = read(slave, buf, MAXLINE)) > 0){
-					// 	printf("%s", buf);
-					// }
+					n = read(slave, buf, MAXLINE);
+					write(STDOUT_FILENO, buf, n);
 
+					break;
+				case PWD:
+					write(slave, &int_cmd, sizeof(int));
+					n = read(slave, buf, MAXLINE);
+					write(STDOUT_FILENO, buf, n);
+					printf("\n");
+					break;
+				case CD:
+					if(cmd_parsed[1] != 0){
+						write(slave, &int_cmd, sizeof(int));
+
+						if(attente_reponse(slave, SHORT_TIMEOUT)){
+
+							read(slave, &info, sizeof(int));
+							if(info == OK){
+
+								write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
+
+							} else {
+								printf("[CLIENT] Problem with slave\n");
+								close(slave);
+								exit(0);
+							}
+
+
+						} else {
+							printf("[CLIENT] Slave has crashed after receive CD\n");
+							close(slave);
+							exit(0);
+						}
+					} else {
+						printf("[CLIENT] Error syntax cd : cd <path>\n");
+					}
 					break;
 				case ERROR :
 					printf("[CLIENT] Error command unknown\n");
@@ -94,10 +149,8 @@ int main(int argc, char **argv){
 						write(slave, &int_cmd, sizeof(int));
 
 						if(attente_reponse(slave, SHORT_TIMEOUT) > 0){
-
-							// printf("passe %s\n", buf);
 							read(slave, &info, sizeof(int));
-							// read(slave, buf, MAXLINE);
+
 
 							if(info == OK){
 								write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
@@ -111,28 +164,7 @@ int main(int argc, char **argv){
 
 										if(file != -1){
 
-											info = OK;
-											write(slave, &info, sizeof(int));
-											nb = 0;
-											while(nb < nb_octets){
-												if(attente_reponse(slave, SHORT_TIMEOUT) > 0){
-													n = read(slave, buf, MAXLINE);
-													nb += n;
-													write(file, buf, n);
-
-													/// bien reçu
-													info = OK;
-													write(slave, &info, sizeof(int));
-
-												} else {
-													printf("[CLIENT] Slave has crashed during the transfert it transfered %d bytes\n", nb);
-													close(slave);
-													exit(0);
-												}
-											}
-
-											printf("[CLIENT] Transfert successfully done!\n");
-											close(file);
+											reception_fichier(file, 0, nb_octets);
 											
 										} else {
 											info = ERROR_OPEN;
@@ -161,6 +193,20 @@ int main(int argc, char **argv){
 						printf("[CLIENT] Error get syntax : get <filename>\n");
 					}
 
+					break;
+
+				case HOST:
+					if(cmd_parsed[1] != 0){
+						if(fork() == 0){ // child
+							char *args[] = {cmd_parsed[1], NULL};
+							execvp(cmd_parsed[1], args);
+
+						} else { // father
+							wait(NULL);
+						}
+					} else {
+						printf("[CLIENT] Error host syntax : host <command>\n");
+					}
 
 					break;
 				default:
@@ -175,4 +221,100 @@ int main(int argc, char **argv){
 
 
 
+}
+
+
+void reception_fichier(int file, int nb, int nb_octets){
+	char buf[MAXLINE];
+	int n;
+
+	lseek(file, nb, SEEK_SET);
+
+	envoi_info(slave, OK);
+
+	while(nb < nb_octets){
+		if(attente_reponse(slave, SHORT_TIMEOUT) > 0){
+
+			n = read(slave, buf, MAXLINE);
+			nb += n;
+			write(file, buf, n);
+
+			/// bien reçu
+			envoi_info(slave, OK);
+
+		} else {
+			printf("[CLIENT] Slave has crashed during the transfert %d bytes : Test %d\n", nb_octets, nb_octets+MAXLINE);
+			close(slave);
+			exit(0);
+		}
+	}
+	if(nb >= nb_octets){
+		printf("[CLIENT] Transfert successfully done!\n");
+		close(file);
+	}
+}
+
+
+int attente_reponse(int fd, int time){
+
+	fd_set readfd;
+
+	struct timeval timeout;
+	timeout.tv_sec = time;
+	timeout.tv_usec = 0;
+
+	FD_ZERO(&readfd);
+	FD_SET(fd, &readfd);
+	return (select(fd+1, &readfd, 0, 0, &timeout));
+
+}
+
+
+void reception_donnees_crash(){
+
+	int n, nb_octets, file;
+	char filename[MAXLINE];
+	int nb_bytes;
+
+	if(attente_reponse(slave, SHORT_TIMEOUT)){
+		n = read(slave, filename, MAXLINE);
+		filename[n+1] = '\0';
+
+		envoi_info(slave, OK);
+
+		if(attente_reponse(slave, SHORT_TIMEOUT)){
+			read(slave, &nb_bytes, sizeof(int));
+
+			envoi_info(slave, OK);
+
+			if(attente_reponse(slave, SHORT_TIMEOUT)){
+				read(slave, &nb_octets, sizeof(int));
+
+				file = open(filename, O_WRONLY, S_IWUSR | S_IRUSR | S_IRGRP  | S_IROTH);
+
+				if(file != -1){
+					printf("[CLIENT] Transfert of %s start at %d\n", filename, nb_bytes);
+
+					reception_fichier(file, nb_bytes, nb_octets);
+
+				} else {
+					printf("[CLIENT] Problem during open file\n");
+					close(slave);
+					exit(0);
+				}
+			} else {
+				printf("[CLIENT] Slave has crashed\n");
+				close(slave);
+				exit(0);
+			}
+		} else {
+			printf("[CLIENT] Slave has crashed\n");
+			close(slave);
+			exit(0);
+		}
+	} else {
+		printf("[CLIENT] Slave has crashed\n");
+		close(slave);
+		exit(0);
+	}
 }

@@ -3,6 +3,9 @@
 #define GET 1
 #define EXIT 0
 #define LS 3
+#define PWD 4
+#define HOST 5
+#define CD 6
 #define ERROR -1
 
 
