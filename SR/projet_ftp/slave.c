@@ -46,6 +46,7 @@ int main(int argc, char **argv){
 	int length;
 	int taille;
 	char buf[MAXLINE];
+	char path[MAXLINE];
 
 	int file;
 	struct stat file_stat;
@@ -146,7 +147,20 @@ int main(int argc, char **argv){
 							    getcwd(cwd, sizeof(cwd));
 							    write(clientfd, cwd, strlen(cwd));
 								break;
+							case CD:
+								printf("[SLAVE] Command cd\n");
+								envoi_info(clientfd, OK);
 
+								n = read(clientfd, path, MAXLINE);
+								path[n+1] = '\0';
+
+								if(chdir(path) == 0){
+									printf("[SLAVE] Current directory has changed\n");
+								} else {
+									printf("[SLAVE] Error with the path\n");
+								}
+
+								break;
 							case GET :
 								envoi_info(clientfd, OK);
 

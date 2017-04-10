@@ -114,6 +114,33 @@ int main(int argc, char **argv){
 					write(STDOUT_FILENO, buf, n);
 					printf("\n");
 					break;
+				case CD:
+					if(cmd_parsed[1] != 0){
+						write(slave, &int_cmd, sizeof(int));
+
+						if(attente_reponse(slave, SHORT_TIMEOUT)){
+
+							read(slave, &info, sizeof(int));
+							if(info == OK){
+
+								write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
+
+							} else {
+								printf("[CLIENT] Problem with slave\n");
+								close(slave);
+								exit(0);
+							}
+
+
+						} else {
+							printf("[CLIENT] Slave has crashed after receive CD\n");
+							close(slave);
+							exit(0);
+						}
+					} else {
+						printf("[CLIENT] Error syntax cd : cd <path>\n");
+					}
+					break;
 				case ERROR :
 					printf("[CLIENT] Error command unknown\n");
 					break;
@@ -227,19 +254,6 @@ void reception_fichier(int file, int nb, int nb_octets){
 	}
 }
 
-int attente_reponse_tres_court(int fd){
-
-	fd_set readfd;
-
-	struct timeval timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 100;
-
-	FD_ZERO(&readfd);
-	FD_SET(fd, &readfd);
-	return (select(fd+1, &readfd, 0, 0, &timeout));
-
-}
 
 int attente_reponse(int fd, int time){
 
