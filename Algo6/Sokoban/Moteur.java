@@ -222,28 +222,62 @@ class Moteur {
 
         return C;
     }
+
+    private ArrayList<Couple> successeurs_test(int x, int y) {
+
+        ArrayList<Couple> C = new ArrayList<Couple>();
+        Couple nord, sud, ouest, est;
+        nord = new Couple(y-1, x);
+        sud = new Couple(y+1, x);
+        ouest = new Couple(y,x-1);
+        est = new Couple(y,x+1);
+
+        if(est_possible(nord.i, nord.j) && est_possible(sud.i, sud.j)){
+            C.add(sud);
+            C.add(nord);
+        }        
+        if(est_possible(est.i, est.j) && est_possible(ouest.i, ouest.j)){
+            C.add(est);
+            C.add(ouest);
+        }
+
+        return C;
+    }
+
+    static public int max(int a, int b){
+        if(a > b){
+            return a;
+        } else {
+            return b;
+        }
+    }
 		
 
     public Dijkstra (){
         int p = 99999;
-	int pz;
+        int pz;
+        int index_z;
         file_a_priorite Fap = new file_a_priorite();
         int [] P = new int[max(t.hauteur,t.largeur)+1];
         Fap.inserer(saci,sacj,0);
         Couple c, suc;
-	 //insérer init de P(x)
-	ArrayList<Couple> succ= new ArrayList<Couple>;
+        ArrayList<Couple> succ = new ArrayList<Couple>();
         do {
         	c = Fap.extraire;
-		succ= successeurs(c.j,c.i);
-		for(int i = 0; i < succ.size(); i++){
-			suc=remove(0);
-			pz = fx(c.i,c.j) + 1;
-			if pz < P(z) {
-				P(z) =pz;
-				Fap.inserer(Z.i,Z.j,pz);
-			}
-		}
+
+            succ = successeurs(c.j,c.i);
+
+            for(int i = 0; i < succ.size(); i++){
+                Couple z = succ.get(i);
+
+            	succ.remove(i);
+
+            	pz = fx(c.i,c.j) + 1;
+            	if pz < P([z] {
+            		P(z) =pz;
+            		Fap.inserer(z.i,z.j, pz);
+            	}
+            }
         }while(y = (buti, butj) );
 
 
