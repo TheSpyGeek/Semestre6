@@ -197,7 +197,7 @@ class Moteur {
         return heuristique(x,y) + nb_deplacement(x,y);
     }
 
-    private  ArrayList<Couple> succ(int x, int y) {
+    private  ArrayList<Couple> successeurs(int x, int y) {
         ArrayList<Couple> C = new ArrayList<Couple>;
         Couple nord, sud, ouest, est;
         nord = new Couple(y, x-1);
@@ -443,16 +443,30 @@ class Moteur {
     }
 
 
+		
+		
 
     public Dijkstra (){
-        p = 
+        int p = 99999;
+	int pz;
         file_a_priorite Fap = new file_a_priorite();
         int [] P = new int[max(t.hauteur,t.largeur)+1];
         Fap.inserer(saci,sacj,0);
-        Couple c;
+        Couple c, suc;
+	 //insérer init de P(x)
+	ArrayList<Couple> succ= new ArrayList<Couple>;
         do {
-            c = Fap.extraire;
-        }
+        	c = Fap.extraire;
+		succ= successeurs(c.j,c.i);
+		for(int i = 0; i < succ.size(); i++){
+			suc=remove(0);
+			pz = fx(c.i,c.j) + 1;
+			if pz < P(z) {
+				P(z) =pz;
+				Fap.inserer(Z.i,Z.j,pz);
+			}
+		}
+        }while(y = (buti, butj) );
 
 
 
