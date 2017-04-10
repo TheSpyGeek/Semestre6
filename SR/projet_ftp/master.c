@@ -8,6 +8,7 @@
 int fd_slave[NB_ESCLAVE];
 int busy[NB_ESCLAVE];
 int tube[2];
+int listenfd;
 
 fd_set readfd;
 node_t * unfinished_transfert = NULL;
@@ -29,7 +30,6 @@ void envoi_info_crash(int id, char ip[INET_ADDRSTRLEN]);
 
 int main(int argc, char **argv){
 
-    int listenfd;
     socklen_t clientlen;
     struct sockaddr_in clientaddr;
     int clientfd;
@@ -281,8 +281,9 @@ int slave_not_busy(){
 
 void handler_kill(int sig){
 	printf("Shutdown server\n");
+	close(listenfd);
 	for(int i=0; i<NB_ESCLAVE; i++){
-		Close(fd_slave[i]);
+		close(fd_slave[i]);
 	}
 	exit(0);
 }

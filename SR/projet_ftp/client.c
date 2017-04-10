@@ -11,6 +11,7 @@ void handler_kill(int sig){
 	write(slave, &int_cmd, sizeof(int));
 	close(slave);
 	printf("\n[CLIENT] Deconnection\n");
+	// printf("CRASH\n");
 	exit(0);
 
 }
