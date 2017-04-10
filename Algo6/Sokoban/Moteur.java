@@ -304,8 +304,8 @@ class Moteur {
                     C.add(nord);
                     C.add(sud);
                 }
-				else
-					C.add(nord);
+		else
+			C.add(nord);
 
         }
 
@@ -315,54 +315,129 @@ class Moteur {
             fx_ouest = fx(ouest.i,ouest.j))
             fx_sud = fx(sud.i, sud.j);
             fx_est = fx(est.i,est.j);
-
-            if(fx_sud = fx_ouest){
+		
+	    //cas où sud et sud sont à la même distances du point
+            if(fx_sud = fx_est){
 
                 if {fx_nord < fx_sud) {
-                    if(fx_ouest < fx_nord){
-                    	C.add(ouest);
-					}
-					else if(fx_ouest = fx_nord){
-						C.add(ouest)
-						C.add(nord);
-					}
-					else
-						C.add(nord);
-                }
-                else if(fx_nord = fx_sud){
-					
-                    C.add(ouest);
-                    C.add(sud);
-                    
-                }
-
-
-            }
-        
-
-            else if (fx_sud = fx_nord){
-                if(fx_est < fx_sud){
-                    C.add(ouest)
-                }
-                else{
-                    C.add(nord);
-                    C.add(sud);
-                }
-            }
-
-
-
-            else if(fx_ouest = fx_nord){
-                if(fx_ouest < fx_snord{
-                    C.add(sud);
-                }
-                else{
-                    C.add(ouest);
-                    C.add(nord);
-                }
-            }
-
+                	if(fx_ouest < fx_nord){
+                    		C.add(ouest);
+			}
+			else if(fx_ouest = fx_nord){
+				C.add(ouest)
+				C.add(nord);
+			}
+			else
+				C.add(nord);
+		}
+		else if (fx_nord = f_sud) {
+			if(fx_ouest < fx_nord){
+                    		C.add(ouest);
+			}
+			else if(fx_ouest = fx_nord){
+				C.add(ouest)
+				C.add(nord);
+				C.add(sud);
+				C.add(est)
+			}
+			else {
+				C.add(nord);
+				C.add(sud);
+				C.add(est);
+                	}
+		}
+		else{
+			if(fx_ouest<fx_sud)
+				C.add(ouest);
+			else if(fx_ouest > fx_sud){
+				C.add(sud);
+				C.add(est);
+			}
+			else {
+				C.add(sud);
+				C.add(est);
+				C.add(ouest);
+			}
+		}
+	}
+        //cas où sud > est
+	else if(fx_est < fx_sud){
+		 if {fx_nord < fx_est) {
+                	if(fx_ouest < fx_nord){
+                    		C.add(ouest);
+			}
+			else if(fx_ouest = fx_nord){
+				C.add(ouest)
+				C.add(nord);
+			}
+			else
+				C.add(nord);
+		}
+		else if (fx_nord = f_est) {
+			if(fx_ouest < fx_nord){
+                    		C.add(ouest);
+			}
+			else if(fx_ouest = fx_nord){
+				C.add(ouest)
+				C.add(nord);
+				C.add(est)
+			}
+			else {
+				C.add(nord);
+				C.add(est);
+                	}
+		}
+		else{
+			if(fx_ouest<fx_est)
+				C.add(ouest);
+			else if(fx_ouest > fx_est){
+				C.add(est);
+			}
+			else {
+				C.add(est);
+				C.add(ouest);
+			}
+		}
         }
+        //cas où fx_sud < fx_est
+	else if (fx_est > fx_sud){
+                if {fx_nord < fx_sud) {
+                	if(fx_ouest < fx_nord){
+                    		C.add(ouest);
+			}
+			else if(fx_ouest = fx_nord){
+				C.add(ouest)
+				C.add(nord);
+			}
+			else
+				C.add(nord);
+		}
+		else if (fx_nord = f_sud) {
+			if(fx_ouest < fx_nord){
+                    		C.add(ouest);
+			}
+			else if(fx_ouest = fx_nord){
+				C.add(ouest)
+				C.add(nord);
+				C.add(sud);
+			}
+			else {
+				C.add(nord);
+				C.add(sud);
+                	}
+		}
+		else{
+			if(fx_ouest<fx_sud)
+				C.add(ouest);
+			else if(fx_ouest > fx_sud){
+				C.add(sud);
+			}
+			else {
+				C.add(sud);
+				C.add(ouest);
+			}
+		}
+	}
 
             
     }
