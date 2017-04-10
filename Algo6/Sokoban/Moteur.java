@@ -197,12 +197,39 @@ class Moteur {
         return heuristique(x,y) + nb_deplacement(x,y);
     }
 
+
+    private ArrayList<Couple> successeurs_max(int x, int y) {
+
+        ArrayList<Couple> C = new ArrayList<Couple>();
+        Couple nord, sud, ouest, est;
+        nord = new Couple(y-1, x);
+        sud = new Couple(y+1, x);
+        ouest = new Couple(y,x-1);
+        est = new Couple(y,x+1);
+
+        if(est_possible(y, x-1)){
+            C.add(ouest);
+        }        
+        if(est_possible(y, x+1)){
+            C.add(est);
+        }
+        if(est_possible(y+1, x)){
+            C.add(sud);
+        }
+        if(est_possible(y-1, x)){
+            C.add(nord);
+        }
+
+        return C;
+    }
+
+
     private  ArrayList<Couple> successeurs(int x, int y) {
-        ArrayList<Couple> C = new ArrayList<Couple>;
+        ArrayList<Couple> C = new ArrayList<Couple>();
         Couple nord, sud, ouest, est;
         nord = new Couple(y, x-1);
         sud = new Couple(y, x+1);
-        ouest= new Couple(y-1,x);
+        ouest = new Couple(y-1,x);
         est = new Couple(y+,x);
         int fx_sud, fx_nord,fx_est, fx_ouest;
 
@@ -432,7 +459,12 @@ class Moteur {
 
             
     }
+}
+}
+}
+}
 
+    
 
 		
 		
@@ -462,6 +494,8 @@ class Moteur {
 
 
     }
+
+
 
 
 
