@@ -38,8 +38,7 @@ int main(int argc, char **argv){
     char buf[MAXLINE];
 
     if(argc < 2){
-    	printf("./client <IP>\n");
-    	exit(0);
+    	strcpy(host, "localhost");
     } else {
     	strcpy(host, argv[1]);
     }

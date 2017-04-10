@@ -53,8 +53,7 @@ int main(int argc, char **argv){
 	int file;
 
 	if(argc < 2){
-    	printf("./slave <IP>\n");
-    	exit(0);
+		strcpy(host, "localhost");
     } else {
     	strcpy(host, argv[1]);
     }
