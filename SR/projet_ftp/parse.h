@@ -3,6 +3,7 @@
 #define GET 1
 #define EXIT 0
 #define LS 3
+#define PWD 4
 #define ERROR -1
 
 

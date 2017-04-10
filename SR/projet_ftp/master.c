@@ -144,7 +144,7 @@ int main(int argc, char **argv){
 	    								if(info == OK){
 
 	    									envoi_info_crash(id_slave, client_ip_string);
-	    									
+	    									remove_by_ip(&unfinished_transfert, client_ip_string);
 	    								}
 	    							} else {
 				    					printf("[MASTER] Slave %d crashed\n", id_slave);
@@ -152,16 +152,8 @@ int main(int argc, char **argv){
 
 	    								
 	    						} else {
-
-		    						info = DEFAULT;
-		    						write(fd_slave[id_slave], &info, sizeof(int));
-	    							
+	    							envoi_info(fd_slave[id_slave], DEFAULT);
 	    						}
-
-
-
-
-
 	    					} else {
 	    						printf("[MASTER] Problem with slave %d\n", id_slave);
 	    					}

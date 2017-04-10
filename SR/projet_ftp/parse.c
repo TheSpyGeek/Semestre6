@@ -105,6 +105,8 @@ int cmd_to_int(char *cmd){
 		return EXIT;
 	} else if(!strcmp(cmd, "ls")){
 		return LS;
+	} else if(!strcmp(cmd, "pwd")){
+		return PWD;
 	} else {
 		return ERROR;
 	}
