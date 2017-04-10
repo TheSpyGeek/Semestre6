@@ -30,7 +30,7 @@
 #define ERROR_OPEN 2
 
 #define SHORT_TIMEOUT 3
-#define LONG_TIMEOUT 90
+#define LONG_TIMEOUT 10
 
 
 void envoi_info(int fd, int info){
