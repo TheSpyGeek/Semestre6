@@ -6,6 +6,7 @@
 
 #include <sys/select.h>
 #include <sys/time.h>
+#include <dirent.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
