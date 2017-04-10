@@ -227,16 +227,16 @@ class Moteur {
         est = new Couple(combi.sac.i, combi.sac.j+1);
 
         if(est_possible_sans_pousseur(nord.i, nord.j) && existe_chemin(combi.perso.i, combi.perso.j, nord.i, nord.j) && est_possible_sans_pousseur(sud.i, sud.j)){
-            C.add(new Sac_Perso(sud, perso_deplace, nb_deplacement + heuristique(sud.i, sud.j)));
+            C.add(new Sac_Perso(sud, perso_deplace, heuristique(sud.i, sud.j)));
         }
         if(est_possible_sans_pousseur(sud.i, sud.j) && existe_chemin(combi.perso.i, combi.perso.j, sud.i, sud.j) && est_possible_sans_pousseur(nord.i, nord.j)){
-            C.add(new Sac_Perso(nord, perso_deplace, nb_deplacement + heuristique(nord.i, nord.j)));
+            C.add(new Sac_Perso(nord, perso_deplace, heuristique(nord.i, nord.j)));
         }
         if(est_possible_sans_pousseur(est.i, est.j) && existe_chemin(combi.perso.i, combi.perso.j, est.i, est.j) && est_possible_sans_pousseur(ouest.i, ouest.j)){
-            C.add(new Sac_Perso(ouest, perso_deplace, nb_deplacement + heuristique(ouest.i, ouest.j)));
+            C.add(new Sac_Perso(ouest, perso_deplace, heuristique(ouest.i, ouest.j)));
         }
         if(est_possible_sans_pousseur(ouest.i, ouest.j) && existe_chemin(perso.i, perso.j, ouest.i, ouest.j) && est_possible_sans_pousseur(est.i, est.j)){
-            C.add(new Sac_Perso(est, perso_deplace, nb_deplacement + heuristique(est.i, est.j)));
+            C.add(new Sac_Perso(est, perso_deplace, heuristique(est.i, est.j)));
         }
 
         return C;
@@ -293,10 +293,11 @@ class Moteur {
                 Sac_Perso z = succ.get(i);
                 // System.out.println("Z = "+z);
 
-                // poids = current.poids+1;
+                // poids = current.poids ;
 
                 // if(poids < z.poids){
-                //     z.poids = poids;
+                    System.out.println("Heu : "+heuristique(z.sac.i, z.sac.j));
+                    z.poids = heuristique(z.sac.i, z.sac.j) + nb_deplacement;
                     // pred[z] = current; pour faire le chemin j'imagine
                     fap.Inserer(z);
                     tg_chemin.setStatut(Color.green, z.sac.i, z.sac.j);
