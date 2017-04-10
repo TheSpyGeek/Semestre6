@@ -202,10 +202,11 @@ int main(int argc, char **argv){
 					    		close(clientfd);
 								break;
 							case LS:
+								printf("[SLAVE] Command ls\n");
 								if(fork() == 0){
 									char *args[] = {"ls",NULL};
-									dup2(clientfd, STDOUT_FILENO);
-									close(clientfd);
+									// dup2(clientfd, STDOUT_FILENO);
+									// close(clientfd);
 									execvp("ls", args);
 									// exit(0);
 								} else {
@@ -214,10 +215,11 @@ int main(int argc, char **argv){
 								break;
 
 							case PWD:
+								// printf("[SLAVE] Command ls\n");
 								if(fork() == 0){ // child
 									char *args[] = {"pwd",NULL};
-									dup2(clientfd, STDOUT_FILENO);
-									close(clientfd);
+									// dup2(clientfd, STDOUT_FILENO);
+									// close(clientfd);
 									execvp("pwd", args);
 									// exit(0);
 								} else { // father

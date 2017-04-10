@@ -142,19 +142,19 @@ int main(int argc, char **argv){
 				case LS:
 					write(slave, &int_cmd, sizeof(int));
 					// while(attente_reponse_tres_court(slave)){
-					while((n = read(slave, buf, MAXLINE)) > 0){
-						// n = read(slave, buf, MAXLINE);
-						write(STDOUT_FILENO, buf, n);
-					}
+					// while((n = read(slave, buf, MAXLINE)) > 0){
+					// 	// n = read(slave, buf, MAXLINE);
+					// 	write(STDOUT_FILENO, buf, n);
+					// }
 
 					break;
 				case PWD:
 					write(slave, &int_cmd, sizeof(int));
 					// while(attente_reponse_tres_court(slave)){
-					while((n = read(slave, buf, MAXLINE)) > 0){
-						// n = read(slave, buf, MAXLINE);
-						write(STDOUT_FILENO, buf, n);
-					}
+					// while((n = read(slave, buf, MAXLINE)) > 0){
+					// 	// n = read(slave, buf, MAXLINE);
+					// 	write(STDOUT_FILENO, buf, n);
+					// }
 					break;
 				case ERROR :
 					printf("[CLIENT] Error command unknown\n");
