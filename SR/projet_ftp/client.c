@@ -227,10 +227,17 @@ int main(int argc, char **argv){
 void reception_fichier(int file, int nb, int nb_octets){
 	char buf[MAXLINE];
 	int n;
+	double duration;
+
+	int nb_start = nb;
 
 	lseek(file, nb, SEEK_SET);
 
 	envoi_info(slave, OK);
+
+	clock_t start, finish;
+	start = clock();
+
 
 	while(nb < nb_octets){
 		if(attente_reponse(slave, SHORT_TIMEOUT) > 0){
@@ -249,7 +256,9 @@ void reception_fichier(int file, int nb, int nb_octets){
 		}
 	}
 	if(nb >= nb_octets){
-		printf("[CLIENT] Transfert successfully done!\n");
+		finish = clock();
+		duration = (double)(finish - start) / CLOCKS_PER_SEC; 
+		printf("[CLIENT] Transfert successfully done in %f sec at %f mo/s!\n", duration, (nb_octets - nb_start)/(duration*1000000));
 		close(file);
 	}
 }

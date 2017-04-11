@@ -32,6 +32,7 @@
 #define SHORT_TIMEOUT 3
 #define LONG_TIMEOUT 90
 
+static const char PATH[] = "/home/thespygeek/Semestre6/SR/projet_ftp";
 
 void envoi_info(int fd, int info){
 	int cpy = info;

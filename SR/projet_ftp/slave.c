@@ -47,6 +47,7 @@ int main(int argc, char **argv){
 	int taille;
 	char buf[MAXLINE];
 	char path[MAXLINE];
+	int error;
 
 	int file;
 	struct stat file_stat;
@@ -116,6 +117,7 @@ int main(int argc, char **argv){
 					    		envoi_info(master, SLAVE_FINISHED);
 					    		connected = 0;
 					    		printf("[SLAVE] Finished with (%s)\n", client_ip_string);
+					    		chdir(PATH);
 					    		close(clientfd);
 								break;
 							case LS:
@@ -152,19 +154,28 @@ int main(int argc, char **argv){
 								envoi_info(clientfd, OK);
 
 								n = read(clientfd, path, MAXLINE);
-								path[n+1] = '\0';
+								path[n] = '\0';
+								printf("[DEBUG] path : %s\n", path);
 
-								if(chdir(path) == 0){
+								if((error = chdir(path)) == 0){
 									printf("[SLAVE] Current directory has changed\n");
+								} else if(error == EACCES){
+									printf("[SLAVE] Error : Access denied to this folder\n");
+								} else if(error == ENOENT){
+									printf("[SLAVE] Error : Folder not found\n");
+								} else if(error == ELOOP){
+									printf("[SLAVE] Error : resolution path\n");
+								} else if(error == ENAMETOOLONG){
+									printf("[SLAVE] Error : path too long\n");
+								} else if(error == ENOTDIR){
+									printf("[SLAVE] Error : this isn\'t a folder\n");
 								} else {
-									printf("[SLAVE] Error with the path\n");
+									printf("[SLAVE] Error : something else\n");
 								}
 
 								break;
 							case GET :
 								envoi_info(clientfd, OK);
-
-
 
 								if(attente_reponse(clientfd, SHORT_TIMEOUT)){
 
