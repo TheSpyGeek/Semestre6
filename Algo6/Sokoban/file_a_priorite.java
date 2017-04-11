@@ -26,11 +26,29 @@ class file_a_priorite {
 		return trouve;
 	}
 
+
+    static public int max(int a, int b){
+        if(a > b){
+            return a;
+        } else {
+            return b;
+        }
+    }
+
 	public void Inserer(Sac_Perso e){
+		int poids, poids2;
 		int index = this.Contient(e);
 		if(index != -1){
 			System.out.println("MAJ");
-			file.get(index).poids = e.poids;
+			poids = file.get(index).poids + file.get(index).distance;
+			poids2 = e.poids + e.distance;
+
+			poids = max(file.get(index).poids, e.poids);
+
+			if(poids == file.get(index).poids){
+				file.get(index).poids = poids;
+				
+			}
 		} else {
 			file.add(e);
 		}
@@ -43,8 +61,8 @@ class file_a_priorite {
 
 
 		for(int i=0; i<file.size(); i++){
-			if(file.get(i).poids < min){
-				min = file.get(i).poids;
+			if(file.get(i).poids+file.get(i).distance < min){
+				min = file.get(i).poids+file.get(i).distance;
 				index = i;
 			}
 		}

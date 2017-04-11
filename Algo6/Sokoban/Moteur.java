@@ -205,9 +205,9 @@ class Moteur {
 
     }
 
-    // private int nb_deplacement(int x, int y){
-    //     return val_absolue(saci-x) + val_absolue(sacj-y);        
-    // }
+    private int nb_deplacement(int y, int x, int i, int j){
+        return val_absolue(j-x) + val_absolue(i-y);        
+    }
 
     // private int fx(int x, int y){
     //     return heuristique(x,y) + nb_deplacement(x,y);
@@ -227,16 +227,16 @@ class Moteur {
         est = new Couple(combi.sac.i, combi.sac.j+1);
 
         if(est_possible_sans_pousseur(nord.i, nord.j) && existe_chemin(combi.perso.i, combi.perso.j, nord.i, nord.j) && est_possible_sans_pousseur(sud.i, sud.j)){
-            C.add(new Sac_Perso(sud, perso_deplace, heuristique(sud.i, sud.j)));
+            C.add(new Sac_Perso(sud, perso_deplace, combi.poids, heuristique(sud.i, sud.j)));
         }
         if(est_possible_sans_pousseur(sud.i, sud.j) && existe_chemin(combi.perso.i, combi.perso.j, sud.i, sud.j) && est_possible_sans_pousseur(nord.i, nord.j)){
-            C.add(new Sac_Perso(nord, perso_deplace, heuristique(nord.i, nord.j)));
+            C.add(new Sac_Perso(nord, perso_deplace, combi.poids, heuristique(nord.i, nord.j)));
         }
         if(est_possible_sans_pousseur(est.i, est.j) && existe_chemin(combi.perso.i, combi.perso.j, est.i, est.j) && est_possible_sans_pousseur(ouest.i, ouest.j)){
-            C.add(new Sac_Perso(ouest, perso_deplace, heuristique(ouest.i, ouest.j)));
+            C.add(new Sac_Perso(ouest, perso_deplace, combi.poids, heuristique(ouest.i, ouest.j)));
         }
         if(est_possible_sans_pousseur(ouest.i, ouest.j) && existe_chemin(perso.i, perso.j, ouest.i, ouest.j) && est_possible_sans_pousseur(est.i, est.j)){
-            C.add(new Sac_Perso(est, perso_deplace, heuristique(est.i, est.j)));
+            C.add(new Sac_Perso(est, perso_deplace, combi.poids, heuristique(est.i, est.j)));
         }
 
         return C;
@@ -257,7 +257,7 @@ class Moteur {
 
         file_a_priorite fap = new file_a_priorite();
 
-        Sac_Perso combi = new Sac_Perso(saci, sacj, lignePousseur, colonnePousseur, heuristique(saci, sacj));
+        Sac_Perso combi = new Sac_Perso(saci, sacj, lignePousseur, colonnePousseur, 0, heuristique(saci, sacj));
         Sac_Perso current;
         // int [] poids = new int[max(t.hauteur(),t.largeur())+1];
         // poids[0] = 0;
@@ -296,17 +296,17 @@ class Moteur {
                 // poids = current.poids ;
 
                 // if(poids < z.poids){
-                    System.out.println("Heu : "+heuristique(z.sac.i, z.sac.j));
-                    z.poids = heuristique(z.sac.i, z.sac.j) + nb_deplacement;
+                    // System.out.println("Heu : "+heuristique(z.sac.i, z.sac.j));
+                    z.poids = current.poids+1;
                     // pred[z] = current; pour faire le chemin j'imagine
                     fap.Inserer(z);
                     tg_chemin.setStatut(Color.green, z.sac.i, z.sac.j);
+                    f.tracer(tg_chemin);
 
 
                 // }
             }
 
-            f.tracer(tg_chemin);
 
         } while(!fap.Est_Vide() && (current.sac.i != buti || current.sac.j != butj));
 
