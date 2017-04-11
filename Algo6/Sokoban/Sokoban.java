@@ -26,22 +26,45 @@ public class Sokoban {
             }
         } else
             t = Terrain.defaut();
-
-        f.setDrawAreaSize(50*t.largeur(),50*t.hauteur());
         TerrainGraphique tg = new TerrainGraphique(f, t);
         Moteur m = new Moteur(t, f);
+        if(args.length == 2){
+	        if(args[1].compareTo("-a")==0){
 
-        e.addMouseListener(new EcouteurDeSouris(f, tg, m));
-        e.addKeyListener(new EcouteurDeClavier(f, t, tg, m));
+		        f.setDrawAreaSize(50*t.largeur(),50*t.hauteur());
+		        f.tracerSansDelai(tg);
+		        m.Explorer();
+		         while (!t.fini()){
+		            e.waitForEvent();
+		        }
+	        }
+	        else if (args[1].compareTo("-m")==0){
+		        
 
-        f.tracerSansDelai(tg);
-        m.Explorer();
+		        e.addMouseListener(new EcouteurDeSouris(f, tg, m));
+		        e.addKeyListener(new EcouteurDeClavier(f, t, tg, m));
 
+		        
+		        while (!t.fini()){
+		            e.waitForEvent();
+		        }
+	    	}
+	    	else {
+	    		System.err.println("ERREUR : mauvaise option :  syntaxe : Sokoban [terrain optionnel] [option]. \n option : -a automatique -m manuel");
+	    		System.exit(1);
+	    	}
+	    }
+	    else {
 
-        
-        while (!t.fini()){
-            e.waitForEvent();
-        }
+	    	e.addMouseListener(new EcouteurDeSouris(f, tg, m));
+		    e.addKeyListener(new EcouteurDeClavier(f, t, tg, m));
+
+		        
+		    while (!t.fini()){
+		        e.waitForEvent();
+		        }
+	    	
+	    }
 
         System.out.println("Jeu fini");
         System.out.println("Score = "+m.nb_mouvement);
