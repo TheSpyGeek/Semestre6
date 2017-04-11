@@ -39,7 +39,7 @@ class file_a_priorite {
 		int poids, poids2;
 		int index = this.Contient(e);
 		if(index != -1){
-			System.out.println("MAJ");
+			// System.out.println("MAJ");
 			poids = file.get(index).poids + file.get(index).distance;
 			poids2 = e.poids + e.distance;
 

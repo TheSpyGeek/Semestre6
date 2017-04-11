@@ -250,6 +250,41 @@ class Moteur {
             return b;
         }
     }
+
+    class couple_de_couple {
+        public Couple sac;
+        public Couple perso;
+
+        couple_de_couple(Couple s, Couple p){
+            this.sac = s;
+            this.perso = p; 
+        }
+    }
+
+    // public class parcouru {
+    //     ArrayList<couple_de_couple> array;
+
+    //     parcouru(){
+    //         array = new ArrayList<couple_de_couple>();
+    //     }
+
+    //     public boolean contient(Couple s, Couple p){
+    //         couple_de_couple c;
+    //         for(int i=0; i<array.size(); i++){
+    //             c = array.get(i);
+    //             if(c.sac.same(c.sac, c.perso)){
+    //                 System.out.println("contient");
+    //                 return true;
+    //             }
+    //         }
+    //         return false;
+    //     }
+
+    //     public void ajout(Couple s, Couple p){
+    //         array.add(new couple_de_couple(s, p));
+    //     }
+
+    // }
 		
 
     public void Explorer(){
@@ -268,9 +303,11 @@ class Moteur {
 
         int nb_deplacement = 0;
 
-
-
         fap.Inserer(combi);
+
+        // parcouru tab = new parcouru();
+
+        Hashtable<couple_de_couple, Integer> parcouru = new Hashtable<couple_de_couple, Integer>();
 
         ArrayList<Sac_Perso> succ = new ArrayList<Sac_Perso>();
 
@@ -284,7 +321,7 @@ class Moteur {
             t_chemin.assigner(Case.POUSSEUR, perso.i, perso.j);
             t_chemin.assigner(Case.SAC, sac.i, sac.j);
 
-            System.out.println("Current = "+current+" Nombre deplacement sac = "+nb_deplacement);
+            // System.out.println("Current = "+current+" Nombre deplacement sac = "+nb_deplacement);
             nb_deplacement++;
             succ = successeurs(current, nb_deplacement);
 
@@ -299,9 +336,17 @@ class Moteur {
                     // System.out.println("Heu : "+heuristique(z.sac.i, z.sac.j));
                     z.poids = current.poids+1;
                     // pred[z] = current; pour faire le chemin j'imagine
-                    fap.Inserer(z);
-                    tg_chemin.setStatut(Color.green, z.sac.i, z.sac.j);
-                    f.tracer(tg_chemin);
+
+
+                    if(!parcouru.containsKey(new couple_de_couple(z.sac, z.perso))){
+                        parcouru.put(new couple_de_couple(z.sac, z.perso), 1);
+                        // System.out.println("passe");
+
+                        fap.Inserer(z);
+                        tg_chemin.setStatut(Color.green, z.sac.i, z.sac.j);
+                        f.tracer(tg_chemin);
+                    }
+
 
 
                 // }
@@ -310,10 +355,10 @@ class Moteur {
 
         } while(!fap.Est_Vide() && (current.sac.i != buti || current.sac.j != butj));
 
-        System.out.println("Fap vide "+fap.Est_Vide());
+        // System.out.println("Fap vide "+fap.Est_Vide());
 
         if(current.sac.i == buti && current.sac.j == butj){
-            System.out.println("Solution trouvé !!!");
+            System.out.println("Solution trouvé !!!\n Nombre de coups : "+current.poids+1);
         } else {
             System.out.println("Solution non trouvé");
         }
