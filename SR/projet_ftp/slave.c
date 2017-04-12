@@ -149,28 +149,115 @@ int main(int argc, char **argv){
 							    getcwd(cwd, sizeof(cwd));
 							    write(clientfd, cwd, strlen(cwd));
 								break;
+							case MKDIR:
+								envoi_info(clientfd, OK);
+								printf("[SLAVE] Command mkdir\n");
+								if(attente_reponse(clientfd, SHORT_TIMEOUT)){
+
+									n = read(clientfd, path, MAXLINE);
+									path[n] = '\0';
+
+									char *args[] = {"mkdir", path, NULL};
+									if(fork() == 0){
+										execvp(args[0], args);
+									} else {
+										wait(NULL);
+									}
+
+								} else {
+									printf("[SLAVE] Client has crashed\n");
+									connected = 0;
+									close(clientfd);
+									envoi_info(master, CLIENT_CRASHED);
+								}
+								break;
+							case RMR:
+							case RM:
+								envoi_info(clientfd, OK);
+								printf("[SLAVE] Command rm\n");
+								if(attente_reponse(clientfd, SHORT_TIMEOUT)){
+
+									n = read(clientfd, path, MAXLINE);
+									path[n] = '\0';
+
+									if(int_cmd == RM){
+										char *args[] = {"rm", path, NULL};
+										if(fork() == 0){
+											execvp(args[0], args);
+										} else {
+											wait(NULL);
+										}
+									} else if(int_cmd == RMR){
+										char *args[] = {"rm", "-r", path, NULL};
+										if(fork() == 0){
+											execvp(args[0], args);
+										} else {
+											wait(NULL);
+										}
+									} else {
+										printf("[SLAVE] Problem with cmd\n");
+										connected = 0;
+										close(clientfd);
+										envoi_info(master, SLAVE_FINISHED);
+									}
+
+								} else {
+									printf("[SLAVE] Client has crashed\n");
+									connected = 0;
+									close(clientfd);
+									envoi_info(master, CLIENT_CRASHED);
+								}
+
+
+								break;
+							case PUT:
+								envoi_info(clientfd, NOT_IMPEMENTED);
+								printf("[SLAVE] put not implemented yet\n");
+
+								/// attente de reception du nom du fichier
+								if(attente_reponse(clientfd, SHORT_TIMEOUT)){
+
+									n = read(clientfd, filename, MAXLINE);
+									filename[n] = '\0';
+
+									
+
+
+								} else {
+									printf("[SLAVE] Client has crashed\n");
+									connected = 0;
+									envoi_info(master, CLIENT_CRASHED);
+									close(clientfd);
+								}
+
+								break;
 							case CD:
 								printf("[SLAVE] Command cd\n");
 								envoi_info(clientfd, OK);
+								if(attente_reponse(clientfd, SHORT_TIMEOUT)){
+									n = read(clientfd, path, MAXLINE);
+									path[n] = '\0';
 
-								n = read(clientfd, path, MAXLINE);
-								path[n] = '\0';
-								printf("[DEBUG] path : %s\n", path);
-
-								if((error = chdir(path)) == 0){
-									printf("[SLAVE] Current directory has changed\n");
-								} else if(error == EACCES){
-									printf("[SLAVE] Error : Access denied to this folder\n");
-								} else if(error == ENOENT){
-									printf("[SLAVE] Error : Folder not found\n");
-								} else if(error == ELOOP){
-									printf("[SLAVE] Error : resolution path\n");
-								} else if(error == ENAMETOOLONG){
-									printf("[SLAVE] Error : path too long\n");
-								} else if(error == ENOTDIR){
-									printf("[SLAVE] Error : this isn\'t a folder\n");
+									if((error = chdir(path)) == 0){
+										printf("[SLAVE] Current directory has changed\n");
+									} else if(error == EACCES){
+										printf("[SLAVE] Error : Access denied to this folder\n");
+									} else if(error == ENOENT){
+										printf("[SLAVE] Error : Folder not found\n");
+									} else if(error == ELOOP){
+										printf("[SLAVE] Error : resolution path\n");
+									} else if(error == ENAMETOOLONG){
+										printf("[SLAVE] Error : path too long\n");
+									} else if(error == ENOTDIR){
+										printf("[SLAVE] Error : this isn\'t a folder\n");
+									} else {
+										printf("[SLAVE] Error : something else\n");
+									}
 								} else {
-									printf("[SLAVE] Error : something else\n");
+									printf("[SLAVE] Client has crashed\n");
+									connected = 0;
+									close(clientfd);
+									envoi_info(master, CLIENT_CRASHED);
 								}
 
 								break;
@@ -438,7 +525,10 @@ void envoi_info_crash_to_client(){
 										}
 									} else {
 										printf("[SLAVE] Client has crashed before sending total bytes\n");
-										close(clientfd);		
+										connected = 0;
+							    		info = CLIENT_CRASHED;
+										write(master, &info, sizeof(int));
+							    		close(clientfd);		
 									}
 								}
 							} else {
@@ -450,8 +540,11 @@ void envoi_info_crash_to_client(){
 						}
 
 					} else {
-						printf("[SLAVE] Client has crashed\n");
-						close(clientfd);		
+			    		printf("[SLAVE] Client has crashed\n");
+			    		connected = 0;
+			    		info = CLIENT_CRASHED;
+						write(master, &info, sizeof(int));
+			    		close(clientfd);		
 					}
 
 				} else {
@@ -459,15 +552,21 @@ void envoi_info_crash_to_client(){
 					close(clientfd);
 				}
 			} else {
-				printf("[SLAVE] Client has crashed\n");
-				close(clientfd);
+	    		printf("[SLAVE] Client has crashed\n");
+	    		connected = 0;
+	    		info = CLIENT_CRASHED;
+				write(master, &info, sizeof(int));
+	    		close(clientfd);
 			}
 		} else {
 			printf("[SLAVE] Client problem\n");
 			close(clientfd);
 		}					
 	} else {
-		printf("[SLAVE] Client has crashed\n");
+		printf("[SLAVE] Client has crashed\n");
+		connected = 0;
+		info = CLIENT_CRASHED;
+		write(master, &info, sizeof(int));
 		close(clientfd);
 		
 	}

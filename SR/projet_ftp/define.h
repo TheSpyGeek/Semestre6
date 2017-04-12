@@ -28,6 +28,7 @@
 
 #define OK 1
 #define ERROR_OPEN 2
+#define NOT_IMPEMENTED 3
 
 #define SHORT_TIMEOUT 3
 #define LONG_TIMEOUT 90

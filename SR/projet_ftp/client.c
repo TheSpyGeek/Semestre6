@@ -102,99 +102,140 @@ int main(int argc, char **argv){
 					printf("[CLIENT] Deconnection\n");
 					exit(0);
 					break;
+
 				case LS:
 					write(slave, &int_cmd, sizeof(int));
 					n = read(slave, buf, MAXLINE);
 					write(STDOUT_FILENO, buf, n);
-
 					break;
+
 				case PWD:
 					write(slave, &int_cmd, sizeof(int));
 					n = read(slave, buf, MAXLINE);
 					write(STDOUT_FILENO, buf, n);
 					printf("\n");
 					break;
-				case CD:
-					if(cmd_parsed[1] != 0){
-						write(slave, &int_cmd, sizeof(int));
 
-						if(attente_reponse(slave, SHORT_TIMEOUT)){
-
-							read(slave, &info, sizeof(int));
-							if(info == OK){
-
-								write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
-
-							} else {
-								printf("[CLIENT] Problem with slave\n");
-								close(slave);
-								exit(0);
-							}
-
-
-						} else {
-							printf("[CLIENT] Slave has crashed after receive CD\n");
-							close(slave);
-							exit(0);
-						}
-					} else {
-						printf("[CLIENT] Error syntax cd : cd <path>\n");
-					}
-					break;
 				case ERROR :
 					printf("[CLIENT] Error command unknown\n");
 					break;
-				case GET : 
+				case MKDIR:
+				case PUT:
+				case CD:
+				case GET: 
 					if(cmd_parsed[1] != 0){
 						write(slave, &int_cmd, sizeof(int));
 
 						if(attente_reponse(slave, SHORT_TIMEOUT) > 0){
 							read(slave, &info, sizeof(int));
 
-
 							if(info == OK){
-								write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
-								printf("[CLIENT] filename (%s) sent\n", cmd_parsed[1]);
-								if(attente_reponse(slave, SHORT_TIMEOUT) > 0){
-									read(slave, &nb_octets, sizeof(int));
-									if(nb_octets > 0){
-										printf("[CLIENT] file : %d bytes\n", nb_octets);
 
-										file = open(cmd_parsed[1], O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP  | S_IROTH);
+								 //// POUR recuperer des fichiers
+								if(int_cmd == GET){
+									write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
+									printf("[CLIENT] filename (%s) sent\n", cmd_parsed[1]);
+									if(attente_reponse(slave, SHORT_TIMEOUT) > 0){
+										read(slave, &nb_octets, sizeof(int));
+										if(nb_octets > 0){
+											printf("[CLIENT] file : %d bytes\n", nb_octets);
 
-										if(file != -1){
+											file = open(cmd_parsed[1], O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP  | S_IROTH);
 
-											reception_fichier(file, 0, nb_octets);
-											
+											if(file != -1){
+
+												reception_fichier(file, 0, nb_octets);
+												
+											} else {
+												info = ERROR_OPEN;
+												write(slave, &info, sizeof(int));
+											}
+
+
 										} else {
-											info = ERROR_OPEN;
-											write(slave, &info, sizeof(int));
+											printf("[CLIENT] Error file %s not found\n", cmd_parsed[1]);
 										}
-
-
 									} else {
-										printf("[CLIENT] Error file %s not found\n", cmd_parsed[1]);
+										printf("[CLIENT] Slave has crashed\n");
+										close(slave);
+										exit(0);
 									}
+
+
+									/// CREATION DE DOSSIER
+								} else if(int_cmd == MKDIR){
+
+									write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
+									// printf("[CLIENT] folder name (%s) sent\n", cmd_parsed[1]);
+
+									// printf("[CLIENT] Folder %s created\n", cmd_parsed[1]);
+								} else if(int_cmd == CD){
+
+									write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
+
 								} else {
-									printf("[CLIENT] Slave has crashed\n");
+									printf("[CLIENT] mais mdr!\n");
 									close(slave);
 									exit(0);
 								}
+							} else if(info == NOT_IMPEMENTED){
+								printf("[CLIENT] %s not implemented\n", cmd_parsed[0]);
 							}
-
-
 						} else {
 							printf("[CLIENT] Slave has crashed\n");
 							close(slave);
 							exit(0);
 						}
-						
 					} else {
-						printf("[CLIENT] Error get syntax : get <filename>\n");
+						printf("[CLIENT] Error syntax : argument missing\n");
 					}
-
 					break;
 
+				case RM:
+					if(cmd_parsed[1] != 0){
+
+						// RM -r 
+						if(!strcmp(cmd_parsed[1], "-r") && cmd_parsed[2] !=0){
+							int_cmd = RMR;
+						// RM normal
+						}
+
+						write(slave, &int_cmd, sizeof(int));
+
+						if(attente_reponse(slave, SHORT_TIMEOUT)){
+							read(slave, &info, sizeof(int));
+							if(info == OK){
+								if(int_cmd == RMR){
+									write(slave, cmd_parsed[2], strlen(cmd_parsed[2]));
+									// printf("[CLIENT] folder name (%s) sent\n", cmd_parsed[2]);
+								} else if(int_cmd == RM){
+									write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
+									// printf("[CLIENT] folder name (%s) sent\n", cmd_parsed[1]);
+								} else {
+									printf("[CLIENT] WTF!!!\n");
+									close(slave);
+									exit(0);
+								}
+							} else if(info == NOT_IMPEMENTED){
+								printf("[CLIENT] rm not implemented yet\n");
+							}
+
+							// printf("[CLIENT] Delete successfully done\n");
+	
+						} else {
+							printf("[CLIENT] Slave has crashed\n");
+							close(slave);
+							exit(0);
+						}
+
+
+					} else {
+						printf("[CLIENT] Error rm syntax : rm <folder/file> or rm -r <folder/file>\n");
+					}
+
+
+
+					break;
 				case HOST:
 					if(cmd_parsed[1] != 0){
 						if(fork() == 0){ // child

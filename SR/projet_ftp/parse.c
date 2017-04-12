@@ -111,6 +111,12 @@ int cmd_to_int(char *cmd){
 		return HOST;
 	} else if(!strcmp(cmd, "cd")){
 		return CD;
+	} else if(!strcmp(cmd, "rm")){
+		return RM;
+	} else if(!strcmp(cmd, "mkdir")){
+		return MKDIR;
+	} else if(!strcmp(cmd, "put")){
+		return PUT;
 	} else {
 		return ERROR;
 	}
