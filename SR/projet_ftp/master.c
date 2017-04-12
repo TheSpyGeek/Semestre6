@@ -23,9 +23,14 @@ void handler_kill(int sig);
 int slave_not_busy();
 
 int fd_max(); // calcul de fd maximum dans le tableau des esclaves + tube[0]
+
+/// recupere les info du crash du client au slave i
+/// et les ajoutes dans le recensement des crash
 void register_crash_transfert(int i);
+
 int attente_reponse(int fd, int time);
 
+/// envoie les info du crash au slave id
 void envoi_info_crash(int id, char ip[INET_ADDRSTRLEN]);
 
 int main(int argc, char **argv){
@@ -136,8 +141,7 @@ int main(int argc, char **argv){
 	    					if(info == OK){
 
 	    						if(contain(&unfinished_transfert, client_ip_string)){
-	    							info = CLIENT_CRASHED;
-	    							write(fd_slave[id_slave], &info, sizeof(int));
+	    							envoi_info(fd_slave[id_slave], CLIENT_CRASHED);
 
 	    							if(attente_reponse(fd_slave[id_slave], SHORT_TIMEOUT)){
 	    								read(fd_slave[id_slave], &info, sizeof(int));

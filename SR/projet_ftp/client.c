@@ -19,11 +19,14 @@ void handler_kill(int sig){
 
 int attente_reponse(int fd, int time);
 
-int attente_reponse_tres_court(int fd);
-
+/// receptionne les données du crash précédent
 void reception_donnees_crash();
 
+// receptionne les données envoyé par le serveur esclave et les ajoutes dans le fichier file
 void reception_fichier(int file, int nb, int nb_octets);
+
+// envoie les données du fichier file au serveur esclave (pour le put) 
+void envoi_fichier_a_esclave(int file, int nb, int nb_octets);
 
 int main(int argc, char **argv){
 
@@ -38,6 +41,7 @@ int main(int argc, char **argv){
     int file;
     int n;
     char buf[MAXLINE];
+    struct stat file_stat;
 
     if(argc < 2){
     	strcpy(host, "localhost");
@@ -172,6 +176,69 @@ int main(int argc, char **argv){
 								} else if(int_cmd == CD){
 
 									write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
+								} else if(int_cmd == PUT){
+
+									printf("passe ici\n");
+
+									write(slave, cmd_parsed[1], strlen(cmd_parsed[1]));
+
+									if(attente_reponse(slave, SHORT_TIMEOUT)){
+										read(slave, &info, sizeof(int));
+
+										if(info == OK){
+
+											file = open(cmd_parsed[1], O_RDONLY);
+
+											if(file != -1){
+
+												if(fstat(file, &file_stat) == 0){
+													nb_octets = file_stat.st_size;
+													printf("[SLAVE] file : %d bytes\n", nb_octets);
+
+													write(slave, &nb_octets, sizeof(int));
+
+													if(attente_reponse(slave, SHORT_TIMEOUT)){
+														read(slave, &info, sizeof(int));
+
+														if(info == OK){
+															envoi_fichier_a_esclave(file, 0, nb_octets);
+														} else {
+															printf("[CLIENT] problem with slave\n");
+															close(slave);
+															exit(0);
+														}
+
+													} else {
+														printf("[CLIENT] slave has crashed\n");
+														close(slave);
+														exit(0);
+													}
+
+
+												} else {
+													printf("[CLIENT] Problem with fstat\n");
+													nb_octets = -1;
+													write(slave, &nb_octets, sizeof(int));
+												}
+											} else {
+												nb_octets = -1;
+												write(slave, &nb_octets, sizeof(int));
+												printf("[CLIENT] Problem open file\n");
+											}
+
+										} else if(info == ERROR_OPEN){
+											printf("[CLIENT] slave cannot open file\n");
+										} else {
+											printf("[CLIENT] Problem with slave\n");
+										}
+
+
+									} else {
+										printf("[CLIENT] Slave a crash \n");
+										close(slave);
+										exit(0);
+									}
+								
 
 								} else {
 									printf("[CLIENT] mais mdr!\n");
@@ -367,4 +434,40 @@ void reception_donnees_crash(){
 		close(slave);
 		exit(0);
 	}
+}
+
+
+void envoi_fichier_a_esclave(int file, int nb, int nb_octets){
+
+	int info;
+	int nb_courant;
+	char buf[MAXLINE];
+
+	lseek(file, nb, SEEK_SET);
+
+	while(nb < nb_octets){
+
+		nb_courant = read(file, buf, MAXLINE);
+		nb += nb_courant;
+		write(slave, buf, nb_courant);
+
+		if(attente_reponse(slave, SHORT_TIMEOUT) > 0){
+			read(slave, &info, sizeof(int));
+			if(info != OK){
+				printf("[SLAVE] Problem with client nb = %d\n", nb);
+			} else {
+
+			}
+		} else {
+			printf("[CLIENT] Slave has crashed during trasnfert\n");
+			close(slave);
+			exit(0);
+		}
+
+	}
+
+	if(nb == nb_octets){
+		printf("[SLAVE] Transfert successfully done!\n");
+	}
+
 }

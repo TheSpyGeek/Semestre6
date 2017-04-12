@@ -11,7 +11,7 @@ char client_ip_string[INET_ADDRSTRLEN];
 char filename[MAXLINE];
 int nb_crash;
 
-
+/// envoie les info du crash client au serveur master
 void sent_crash_to_master(char ip_string[], int nb_bytes, char filename[]);
 
 
@@ -21,14 +21,20 @@ void handler_kill(int sig){
 	exit(0);
 }
 
+// receptionne les données envoyé par le client et les ajoutes dans file
+void reception_fichier(int file, int nb, int nb_octets);
+
+// envoie les données du fichier file au client
 void envoi_fichier_au_client(int file, int nb, int nb_octets, char filename[]);
 
 int attente_reponse(int fd, int time);
 
-void ls();
 
 
+// receptionne les info du crash pour les utiliser pour reprendre le transfert
 void reception_info_crash_from_master();
+
+// envoie les info du crash au client
 void envoi_info_crash_to_client();
 
 int main(int argc, char **argv){
@@ -45,7 +51,6 @@ int main(int argc, char **argv){
 	char cwd[MAXLINE];
 	int length;
 	int taille;
-	char buf[MAXLINE];
 	char path[MAXLINE];
 	int error;
 
@@ -65,6 +70,7 @@ int main(int argc, char **argv){
 
     printf("[SLAVE] Connected to master server\n"); 
 
+
     while(1){
     	printf("[SLAVE] Waiting for client\n"); 
 
@@ -80,8 +86,10 @@ int main(int argc, char **argv){
 
 	    	read(master, &info, sizeof(int));
 
+
+	    	/// Si le client avait crash durant le transfert
 	    	if(info == CLIENT_CRASHED){
-	    		// printf("[SLAVE] Client crashed before\n");
+
 				envoi_info(master, OK);
 
 				reception_info_crash_from_master();
@@ -92,7 +100,7 @@ int main(int argc, char **argv){
 
 				envoi_info_crash_to_client();
 
-	    	} else {
+	    	} else if(info == DEFAULT){
 	    		envoi_info(master, OK);
 	    		envoi_info(clientfd, DEFAULT);
 	    	}
@@ -127,19 +135,20 @@ int main(int argc, char **argv){
 							    getcwd(cwd, sizeof(cwd));
     							rep = opendir(cwd);
 
-    							strcpy(buf, "");
+    							char list[MAXLINE];
+    							strcpy(list, "");
     							taille = 0;
 
     							while ((fichierLu = readdir(rep)) != NULL){
     								if(strcmp(fichierLu->d_name, ".") && strcmp(fichierLu->d_name, "..")){
 	    								length = strlen(fichierLu->d_name);
 	    								taille += length +1;
-	    								strcat(buf, fichierLu->d_name);
-	    								strcat(buf, "\n");
+	    								strcat(list, fichierLu->d_name);
+	    								strcat(list, "\n");
     								}
     							}
 
-    							write(clientfd, buf, taille);
+    							write(clientfd, list, taille);
 
 								break;
 
@@ -211,8 +220,8 @@ int main(int argc, char **argv){
 
 								break;
 							case PUT:
-								envoi_info(clientfd, NOT_IMPEMENTED);
-								printf("[SLAVE] put not implemented yet\n");
+								envoi_info(clientfd, OK);
+								printf("[SLAVE] Command put\n");
 
 								/// attente de reception du nom du fichier
 								if(attente_reponse(clientfd, SHORT_TIMEOUT)){
@@ -220,7 +229,37 @@ int main(int argc, char **argv){
 									n = read(clientfd, filename, MAXLINE);
 									filename[n] = '\0';
 
-									
+									file = open(filename, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP  | S_IROTH);
+
+									if(file != -1){
+
+										envoi_info(clientfd, OK);
+
+										if(attente_reponse(clientfd, SHORT_TIMEOUT)){
+
+											read(clientfd, &nb_octets, sizeof(int));
+
+											if(nb_octets > 0){
+
+												envoi_info(clientfd, OK);
+
+												reception_fichier(file, 0, nb_octets);
+
+											} else {
+												printf("[SLAVE] problem client during open file\n");
+											}
+
+										} else {
+											printf("[SLAVE] Client has crashed\n");
+											envoi_info(master, CLIENT_CRASHED);
+											connected = 0;
+											close(clientfd);
+										}
+
+									} else {
+										printf("[SLAVE] Problem openning file\n");
+										envoi_info(clientfd, ERROR_OPEN);
+									}
 
 
 								} else {
@@ -297,8 +336,7 @@ int main(int argc, char **argv){
 											} else {
 												printf("[SLAVE] Client has crashed before start of transfert\n");
 									    		connected = 0;
-									    		info = CLIENT_CRASHED;
-												write(master, &info, sizeof(int));
+												envoi_info(master, CLIENT_CRASHED);
 									    		close(clientfd);
 											}						
 										}
@@ -311,8 +349,7 @@ int main(int argc, char **argv){
 								} else {
 									printf("[SLAVE] Client has crashed before send filename\n");
 						    		connected = 0;
-						    		info = CLIENT_CRASHED;
-									write(master, &info, sizeof(int));
+						    		envoi_info(master, CLIENT_CRASHED);
 						    		close(clientfd);
 								}
 
@@ -327,8 +364,7 @@ int main(int argc, char **argv){
 
 		    		printf("[SLAVE] Client has crashed\n");
 		    		connected = 0;
-		    		info = CLIENT_CRASHED;
-					write(master, &info, sizeof(int));
+		    		envoi_info(master, CLIENT_CRASHED);
 		    		close(clientfd);
 		    	}
 	    		
@@ -587,12 +623,42 @@ int attente_reponse(int fd, int time){
 }
 
 
- void ls(){
+
+void reception_fichier(int file, int nb, int nb_octets){
+	char buf[MAXLINE];
+	int n;
+	double duration;
+
+	int nb_start = nb;
+
+	lseek(file, nb, SEEK_SET);
+
+	envoi_info(clientfd, OK);
+
+	clock_t start, finish;
+	start = clock();
 
 
-// while ((fichierLu = readdir(rep)) != NULL)
-//     printf("Le fichier lu s'appelle '%s'\n", fichierLu->d_name);
+	while(nb < nb_octets){
+		if(attente_reponse(clientfd, SHORT_TIMEOUT) > 0){
 
- 	
- }
+			n = read(clientfd, buf, MAXLINE);
+			nb += n;
+			write(file, buf, n);
 
+			/// bien reçu
+			envoi_info(clientfd, OK);
+
+		} else {
+			printf("[SLAVE] Client has crashed during the transfert %d bytes\n", nb_octets);
+			close(clientfd);
+			exit(0);
+		}
+	}
+	if(nb >= nb_octets){
+		finish = clock();
+		duration = (double)(finish - start) / CLOCKS_PER_SEC; 
+		printf("[SLAVE] Transfert successfully done in %f sec at %f mo/s!\n", duration, (nb_octets - nb_start)/(duration*1000000));
+		close(file);
+	}
+}
